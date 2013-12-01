@@ -1,0 +1,823 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+	<title>Claims-Based Authentication and Authorization - CodeProject</title> 
+	<link type="text/css" rel="stylesheet" href="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/Main.css">
+<link type="text/css" rel="stylesheet" href="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/print.css">
+
+	
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="Description" content="Authentication and Authorisation with MembershipReboot and Thinktecture.IdentityModel.45; Author: David Rogers Dev; Updated: 12 Sep 2013; Section: Cryptography &amp; Security; Chapter: General Programming; Updated: 12 Sep 2013">
+<meta name="Keywords" content="C#, ASP.NET, .NET, Dev, Intermediate, .NET4.5,Cryptography &amp; Security,General Programming,Free source code, tutorials">
+<meta name="Author" content="David Rogers Dev">
+<meta name="Rating" content="General">
+<meta name="Robots" content="index, follow, NOODP">
+<meta name="Revisit-After" content="1 days">
+<meta name="application-name" content="CodeProject">
+
+<link rel="dns-prefetch" href="http://ajax.googleapis.com/"> 
+<link rel="canonical" href="http://www.codeproject.com/Articles/639458/Claims-Based-Authentication-and-Authorization">
+
+
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - All Topics" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=1">
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - MFC/C++" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=2">
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - C#" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=3">
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - VB.NET" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=6">
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - Mobile" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=18">
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - ASP.NET" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=4">
+<link rel="alternate" type="application/rss+xml" title="CodeProject Lounge Postings" href="http://www.codeproject.com/webservices/LoungeRSS.aspx">
+<link rel="search" type="application/opensearchdescription+xml" title="CodeProject" href="http://www.codeproject.com/info/OpenSearch.xml">
+
+	<!-- base href="http://www.codeproject.com/Articles/639458/Claims-Based-Authentication-and-Authorization?display=Print" -->
+	<link rel="icon" href="http://www.codeproject.com/favicon.ico" type="image/ico">
+<link rel="shortcut icon" href="http://www.codeproject.com/favicon.ico" type="image/ico">
+<link rel="apple-touch-icon" href="http://www.codeproject.com/images/FavIcon-Apple.png" type="image/png">
+<script type="text/javascript" language="Javascript">//<![CDATA[
+function defrm () { /* thanks twitter */ document.write = ''; window.top.location = window.self.location;  setTimeout(function() { document.body.innerHTML = ''; }, 0);  window.self.onload = function(evt) { document.body.innerHTML = ''; }; }if (window.top !== window.self) {  try {  if (window.top.location.host) { /* will throw */ } else { defrm(); /* chrome */ }  } catch (ex) { defrm(); /* everyone else */ } }if (typeof(DemoUrl)!='undefined')   document.write(unescape('%3Cme')+'ta http'+'-equiv="re'+'fresh"                  con'+'tent="1;url='+DemoUrl+unescape('"%3CE'));
+
+//]]>
+</script>
+
+	
+
+
+
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-1735123-1']);
+	_gaq.push(['_trackPageview']);
+	_gaq.push(['_setDomainName', 'www.codeproject.com']);
+	_gaq.push(['_setSessionTimeout', '1200']); 
+
+	(function () {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+	})(); 
+</script><script src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/ga.js" async="" type="text/javascript"></script>
+
+
+</head>	
+
+<body class="firefox firefox25">
+
+<a href="#Main"><img alt="Click here to Skip to main content" class="access-link" src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/t.gif"></a>
+
+
+
+
+
+<div class="page-background">
+
+	
+	
+
+	
+<div class="alert-bar  overlay " style="display: none;">
+	<a href="#" class="close-notify">×</a>
+	<div>Sign up for our free weekly <a href="http://www.codeproject.com/feature/web-newsletter">Web Developer Newsletter</a>.</div>
+</div>
+
+	<table id="ctl00_Bn" style="width:100%;height:135px" class="banner fluid" cellpadding="0" cellspacing="0">
+	<tbody><tr valign="bottom">
+		<td class="blank-background" style="height:31px">&nbsp;</td>
+		<td class="blank-background" rowspan="3" style="width:250px;height:135px"><a href="http://www.codeproject.com/"><img id="ctl00_Logo" tabindex="1" title="CodeProject" src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/logo250x135.gif" alt="Home" style="height:135px;width:250px;border-width:0px;"></a></td>
+		<td class="blank-background align-right" style="width:728px;height:31px"></td>
+		<td class="blank-background" style="height:31px">&nbsp;</td>
+	</tr>
+	<tr valign="middle">
+		<td class="theme1-background" style="height:94px">&nbsp;</td>
+		<td class="theme1-background ad"></td>
+		<td class="theme1-background" style="height:94px">&nbsp;</td>
+	</tr>
+	<tr valign="top">
+		<td style="height: 10px;"></td>
+		<td style="height: 10px;" class="blank-background"></td>
+		<td style="height: 10px;"></td>
+	</tr>
+</tbody></table>
+
+
+	<a href="#Main"><img alt="Click here to Skip to main content" class="access-link" src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/t.gif"></a>
+
+	
+	
+	
+
+	<div id="A" class="container-content-wrap fluid print"> 
+
+	<div itemscope="" itemtype="http://schema.org/Article" class="container-content"> 
+
+		<div class="clearfix">
+			<div class="float-left container-breadcrumb">
+				<div><a href="http://www.codeproject.com/script/Content/SiteMap.aspx">Articles</a> » <a href="http://www.codeproject.com/Chapters/6/General-Programming.aspx">General Programming</a> » <a href="http://www.codeproject.com/KB/security/"><span itemprop="articleSection">Cryptography &amp; Security</span></a> » <a href="http://www.codeproject.com/KB/security/#Security">Security</a></div>
+			</div>
+
+			<div class="align-left float-right padded-top">
+				
+			</div>
+
+			<div class="float-right container-breadcrumb article-nav">
+				
+			</div>
+
+			<div class="align-right float-left">
+				
+			</div>
+		</div>
+
+		<table class="extended container-article-parts" cellpadding="0" cellspacing="0"><tbody><tr valign="top">
+		<td>
+
+			
+
+		</td>
+		<td>
+			
+			<div id="AT" class="container-article  fluid tight"> 
+				<div class="article">
+
+					<form name="aspnetForm" method="post" action="/Articles/639458/Claims-Based-Authentication-and-Authorization?display=Print" id="aspnetForm" style="margin:0;padding:0">
+<div>
+<input name="__VIEWSTATE" id="__VIEWSTATE" value="HZ7702KZALBMH5DeOTW9XPwBq/TPumWubLHTL/fyf2dsH86r0uebVO2o0X/+6c6kcl5AsRbhQktcM4kq8w6E/4zg1wV3eeR6tlyjEypFGPuK+DN84+rTCaqWicTf0H5amXtOG2LBeQ81w8VrMhFIgASMSLPhaY+PBE223O+l//w2nlWrSzozCltKNXzlClh1A8/AcceuirNR/Mgivpzi/LaqVA+1pZY/3V/drHCVhreUYtU6AEc/5WFkF/pNGQWa0uKMju0J12yTEEe6bXDoLwHFjZhYk16NbCnvvsjBP5pT6CgkUFeNPacljGDUWnSn78MlI4I0GIh0SDMYCYbI5YoiiRSNIAI8H72ZJKdgZOtVOd4YNPRLF2wOQ20IiUgvnXhIGtMYP/SseIBOezE20MNYakO/J97UlF4OJ6Y9GoaZB9CV6B9B/L6UWSxsxEY3uH03bj+5WvkDfQg7ypCIU088drcqnujk0rv/GXXLL9E4aoEbuUktqgR4cG83j6gX8UayLZ6CTPsMnEtLPjGq2DoTVhtBaCuKIk7AAZCj8HeMkloqlHENcGmJMvTGG5ggaAYiAHc/ksFYm6/LMlE6tAGlCJGp8BPxMSt1cWZupValIE2UJDh9k6bY/mFycviW5N9IaTw5RxDbSerFKLYij8S+8KVWo77gJxToqh7fD92Hnn29PoDGFaLhCxckXE/PuliBqskjeXEh3QLs7Xr24gviOZieoojTghXtQQezPSzT+071BzfYwwO7uDzuqvYuLrULTg235ylEJ05PwtOOLvQkBlIftptbLq4JxJos1uyXJ0+WkZGHHf9DW7zvpl2hcQs32DSmf9z299IoJBvuU6N2qCqbNgVG4EzZwPmqB1QH+zxkQkpmI0l3M66LumjmMvaQTyQyFPn/PD1hoMUte0LHOsRl+ogoHjRta/FDgGEaxwuXgbhd1Lbejy7vogHY3PZ1feQz4vNd5J1PSwlwOAPC+7Ky4oE3A9E0/JVEsznINYr66qW65DYrOfLVwhdkpzXT29Dz8/Vu9YHhrVNnJIKvaywfxK6EjgrEVVM7s8Nvz2G3gRQokgG39YqBVxVAFTgme0W+pQWGgpTe8aP4LU5A3yboPZKDE2tBcjhtUBVSEky9KhprZ16U1eJK9248z61nu128ZyJCxqbQk5Yn8s2hSLmuFW9Qt3j6FYphOv10teWJK2cCN71E/JafhQi+84prQTPHea8KR2ppzUNCZmANpS9bjrcBnAeDzehSzWVhDcdCZwGuj9ms3Ei5DSKq7uVL24sMdD2wTQPPJhpTSC9CCjdbkV4UetDmuu0AnfSeALpDcWuOZI6qESIMs4p1eqnvMiepEQ55/K7NspNKggVFnOBsHneGQIqbuUTmFSIXlIki3RNFbqDyhelMsK+9swTvat9D7wJ3Q121CrMcCg/HB5Q6HPhFeYAdj8oOKaMcYKA0RSNmv8blG6r0oLxCyKGlwITZimTxAt+bGiAEmF9sdWIgN3LFwqoFChnACcWODefooxPe+rTYYQDc4MIuaUb3MYEGMjej4OREYvyeQeMCXvJ+xJP/CjKZHbGE4sK6Ni1T6nrcLY0eDMEcgtEgpotyVzxlaPnejv1UYtxTERiMD5FQhj2yd0YwRIZqUUIQT190C6/wsBMtvAlXp8u6xANgZjNxgSMyBBZE0QXyPWofL5KPb/LsQflvFO2sO2pGJr4jiCHy7pxa+Yg5iJ8D/NB9OLObv7h7gV8XduifDP6/7GcqWVwGBVDyFWn+m8Dn6mSLIln7KjbwrdFB5K72Df+KuuBBbHgTDPr/HWJlgvCP+lNWozmP8ky3UoHA7qzYFjG40qOYCLNQuxxqxdaP+depl0iDBqIHsOXb/SovdJClrxtxXRh9lR5Qc7LyGO0D6UFtmF4mUC/VPmhSUnHhrcTORudy5GXZULbzMSGfTGME7jdXy+8XRGVwYNUnQ/pIb0g0pE+TpGv2NREcW12P0YRqZAw2Zbax2C/2+9UVLDdK+4qWN4faifm5TgvasyCusDAKcjHUFPjTLI0/vbZSmwyIsGDXucUL1XvPOVx9RlAleqXrk8KkGE3rcQxjAiOIw9D2LaJtgNB9zWOTCy6QyeLIKQ2n6wqp4Sd7R4qojA6/kHAh93ZWJy3lueaYUehTqvoY7OA+MIbCu+jA8y27mdBnYdigD10pfpE4qnVFVzqpd3bHXwHpdG2LBK3AQDqyO4ybsvqrgStMPYSn5l1D60Nsgg==" type="hidden">
+</div>
+
+
+					
+					 
+					<div class="header">
+
+					<a name="Main"></a>
+
+					
+					<a name="_articleTop" id="_articleTop"></a>
+					<div class="title">
+					
+					
+					<h1 id="ctl00_ArticleTitle" itemprop="name">Claims-Based Authentication and Authorization</h1> 
+					</div>
+
+					
+					<div class="entry">
+						By <span class="author"><a href="http://www.codeproject.com/script/Membership/View.aspx?mid=9395361" rel="author"><span itemprop="author" itemscope="" itemtype="http://schema.org/Person"><span itemprop="name">David Rogers Dev</span></span></a></span>, 
+						<span class="date" itemprop="dateModified" content="2013-09-12 21:26:00">
+							12 Sep 2013</span>
+			
+									
+					</div>
+
+					
+					<table class="voting-bar"><tbody><tr><td nowrap="nowrap">
+						<div id="ctl00_CurRat" class="tooltip anchorLink" style="cursor:pointer">
+				
+							
+
+<table class="small-text" itemprop="aggregateRating" itemscope="" itemtype="http://schema.org/AggregateRating" cellpadding="0" cellspacing="0"> 
+<tbody><tr>
+	
+	<td class="nowrap">
+
+		
+			<meta itemprop="bestRating" content="5"> 
+			<meta itemprop="worstRating" content="1">
+		
+
+		<span id="ctl00_ArticleRating_VI">
+		<div class="nowrap rating-stars-large" style="height:19px;width:139px;position:relative;">
+	<div class="clipped align-left float-left" style="height:19px;width:139px;">
+		<img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/stars-fill-lg.png" style="border-width:0px;">
+	</div><div class="clipped" style="height:19px;width:0px;position:relative;">
+		<img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/stars-empty-lg.png" style="border-width:0px;position:absolute;top:0;right:0;">
+	</div>
+</div>
+		</span>
+
+		
+	</td>
+	
+	<td id="ctl00_ArticleRating_VR" class="nowrap">
+		&nbsp;
+		<span id="ctl00_ArticleRating_VotesR">&nbsp;<span itemprop="ratingValue" class="rating">5.00</span> (<span itemprop="ratingCount" class="count">6</span> votes)</span>
+		
+	</td>
+
+</tr>
+
+</tbody></table>
+
+
+							<div id="ctl00_RB" class="speech-bubble-container-up">
+								<div class="speech-bubble-up" style="width:150px !important">
+									            
+<div>
+<table class="feature" title="Voting Distribution. Recent data only" cellpadding="0" cellspacing="0" height="20px" width="100%"><tbody><tr class="chart-row"><td class="chart-column"><img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/t_002.gif" alt="" title="" border="0px" height="1px" width="20pxpx"><br><span title="0 votes">1</span></td>
+<td class="chart-column"><img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/t_002.gif" alt="" title="" border="0px" height="1px" width="20pxpx"><br><span title="0 votes">2</span></td>
+<td class="chart-column"><img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/t_002.gif" alt="" title="" border="0px" height="1px" width="20pxpx"><br><span title="0 votes">3</span></td>
+<td class="chart-column"><img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/t_002.gif" alt="" title="" border="0px" height="1px" width="20pxpx"><br><span title="0 votes">4</span></td>
+<td class="chart-column"><img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/pollcol.gif" alt="6 votes, 100.0%" title="6 votes, 100.0%" border="0px" height="20px" width="20pxpx"><br><span title="6 votes">5</span></td>
+</tr></tbody></table><div class="small-text align-center">5.00/5 - 6 votes</div><div class="small-text align-center subdue">μ 5.00, σ<sub>a</sub> 1.10 [<a href="http://www.codeproject.com/KB/FAQs/RatingReputationFAQ.aspx#noisefilter">?</a>]</div>
+</div>
+								</div>
+								<div class="speech-bubble-pointer-up">
+									<div class="speech-bubble-pointer-up-inner"></div>
+								</div>
+							</div>
+						</div>
+					</td>
+					<td>
+						
+					</td>
+					
+					</tr></tbody></table>
+
+					</div>
+					
+					
+
+					
+					
+
+					
+					
+					
+
+						
+					
+
+					
+
+							
+							<div id="contentdiv" class="text" itemprop="articleBody">
+							
+
+
+
+<h2>Introduction</h2>
+<p>You can download the Visual Studio solutions for this article <a title="code" href="https://skydrive.live.com/redir?resid=FDC978B63E696199%21500" target="_blank">at this location</a>. With all the Nuget binaries, it's about 57 
+MB (too big to be hosted here at codeproject.com).</p>
+<p>The out-of-the-box authentication and authorization mechanisms for 
+ASP.NET are old and haggard. I never really cared for the membership 
+provider. Fortunately, Microsoft has developed an alternative for 
+authentication and authorization, with <em>claims-based security,</em> which is now part of the <code>System.IdentityModel</code>
+ namespace. And there are a few very smart people out there who have 
+developed some open source projects which makes it easy to use 
+claims-aware authentication and authorization.</p>
+<p>In this article, I plan to walk you through a simple, bare-bones 
+security implementation for an ASP.NET MVC 4 application. This 
+implementation will use:</p><ol><li><a title="MembershipReboot library" href="https://github.com/brockallen/BrockAllen.MembershipReboot" target="_blank">MembershipReboot</a> library for authentication; and   </li><li><a title="Thinktecture.IdentityModel.45 project" href="https://github.com/thinktecture/Thinktecture.IdentityModel.45" target="_blank">Thinktecture.IdentityModel.45</a> for authorization.</li></ol><p>I
+ intend to implement this sample application in stages, with a view to 
+including each stage (or snapshot) of the code in the download code 
+accompanying this article. The idea is that the reader follows the code 
+in this article with the download code and watches it evolve. Each step 
+of the way to demonstrate how the authentication/authorization works. My
+ focus will be on the security configuration and code. Rather than 
+trying to figure it all out from the finished product, you will be able 
+to get your bearings with one of the snapshots.</p>
+<p>Note that I will be paying no mind to look and feel. I will keep it 
+low-fidelity, so as not to distract from the focus of the article.</p>
+<p><strong>Update</strong>: Since writing this article, I have become aware of a new membership system from Microsoft for ASP.NET called <a href="http://http//blogs.msdn.com/b/webdev/archive/2013/06/27/introducing-asp-net-identity-membership-system-for-asp-net-applications.aspx">ASP.NET Identity</a>.
+ It appears that this system does not sit on top of the old Membership 
+API. In addition, it is claims-aware. That being the case, it may be 
+worth looking at as the authentication system for your ASP.NET 
+applications.</p>
+
+
+<h2>Authentication – Preliminary</h2>
+<p>In the sample application, I will be using Forms authentication. Note
+ that this does not mean I have to use the Membership provider. The 
+membership API is available, but certainly not mandatory. It is merely 
+an abstraction of a data store. I have chosen to use Brock Allen’s 
+library, <a title="MembershipReboot project" href="https://github.com/brockallen/BrockAllen.MembershipReboot" target="_blank">MembershipReboot </a>which,
+ despite its name, has nothing to do with the Membership provider. In 
+fact, it is not a provider at all. It is a library which performs a 
+large number of authentication-related functions, including:</p><ol><li>creating a new user, including encryption/hashing of the password</li><li>verifying the identity of a user</li><li>enabling the unlocking of a user</li><li>resetting the password of the user</li></ol><h2>Getting Started with MembershipReboot</h2>To get started, create a new project in <strong>Visual Studio 2012</strong>, using the project template for an <strong>ASP.NET MVC 4</strong> Web Application. Choose the <strong>basic</strong> template. As MembershipReboot has a Nuget package, use Nuget to bring down the <strong>MembershipReboot</strong>
+ dll and have it referenced in your project. The next thing you need is 
+the data store. I went for a SQL Server 2008 R2 (v.661) database. You 
+can call this database anything you like and the great thing about it 
+is, the tables we are about to create will just be normal tables which 
+are part of your larger database (e.g. a database which persists data 
+for a bespoke application).
+<p>On to those tables. The easiest way to create them is to run the SQL 
+scripts which can be downloaded with the source code of the 
+MembershipReboot project. You can download the source <a title="MembershipReboot on GitHub" href="https://github.com/brockallen/BrockAllen.MembershipReboot" target="_blank">from here</a> and you will find 
+four SQL scripts in the folder 
+<em>Migrations.SqlServer\Sql</em>. For your convenience, I have included
+ those scripts in the download code for this article. You should run 
+those scripts in the following order:</p><ol><li>
+	<em>201301101956394_InitialMigration.sql</em></li><li><em>201302251410424_ExpandKeyAndAddAccountCloseFields.sql</em></li><li>
+	<em>201304152032598_NameId.sql</em></li><li><em>201304160322055_VerificationPurpose.sql</em></li></ol><p>Now we have a database (I called mine MembershipReboot, but that was for a lack of imagination) with two tables:</p>
+<ol><li>UserAccounts</li><li>UserClaims</li></ol><p>This is our data 
+store for all things authentication. That is, creating users, deleting 
+users, resetting passwords, locking out users, unlocking users, logging 
+in users, logging out users etc.</p><h2>Let's Quickly Skip Ahead and Create a User</h2><p>At
+ this point, we need to add a user to the database. We cannot just add 
+one using simple SQL statements in the back-end. The users' password 
+needs to be hashed properly. That being the case, we need to create a 
+user using some kind of front-end, which will perform the proper 
+hashing. The application in the download code includes a page to do just
+ that.</p><p>So, we’ll take a quick detour. To add a user: </p>
+<ol><li>in the download code, open the Visual Studio solution in the directory called <em>ClaimsAspMvc</em>;</li><li>run the solution, click the only hyperlink on the page to navigate to the <strong>Create a New User</strong> page; </li><li>complete the form to add a user.</li><li>check that the new user is in the database using SQL Server Management Studio.</li></ol><p>With our new user added, we can now proceed. But first, close that solution, as that is the end-game.</p>
+<h2>Configuring Web.config for MembershipReboot</h2>
+<p>So far, we have created a SQL Server database (I am using SQL Server 
+2008 R2) and created an ASP.NET MVC 4 project with the MembershipReboot 
+library added to the solution via Nuget. Now we need to configure the 
+application to use Forms Authentication for authentication and we need 
+to configure MembershipReboot.</p>
+<h3>1. Remove the following elements from the Web.config file:</h3><pre lang="xml"><span class="code-keyword">&lt;</span><span class="code-leadattribute">profile</span> <span class="code-attribute">defaultProvider</span><span class="code-keyword">="</span><span class="code-keyword">DefaultProfileProvider"</span><span class="code-keyword">&gt;</span>
+  <span class="code-keyword">&lt;</span><span class="code-leadattribute">providers</span><span class="code-keyword">&gt;</span>
+    <span class="code-keyword">&lt;</span><span class="code-leadattribute">add</span> <span class="code-attribute">name</span><span class="code-keyword">="</span><span class="code-keyword">DefaultProfileProvider"</span> 
+      <span class="code-attribute">type</span><span class="code-keyword">="</span><span class="code-keyword">System.Web.Providers.DefaultProfileProvider, System.Web.Providers, 
+            Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"</span> 
+      <span class="code-attribute">connectionStringName</span><span class="code-keyword">="</span><span class="code-keyword">DefaultConnection"</span> <span class="code-attribute">applicationName</span><span class="code-keyword">="</span><span class="code-keyword">/"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+  <span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">providers</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">profile</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-leadattribute">membership</span> <span class="code-attribute">defaultProvider</span><span class="code-keyword">="</span><span class="code-keyword">DefaultMembershipProvider"</span><span class="code-keyword">&gt;</span>
+  <span class="code-keyword">&lt;</span><span class="code-leadattribute">providers</span><span class="code-keyword">&gt;</span>
+    <span class="code-keyword">&lt;</span><span class="code-leadattribute">add</span> <span class="code-attribute">name</span><span class="code-keyword">="</span><span class="code-keyword">DefaultMembershipProvider"</span> 
+      <span class="code-attribute">type</span><span class="code-keyword">="</span><span class="code-keyword">System.Web.Providers.DefaultMembershipProvider, System.Web.Providers, 
+            Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"</span> 
+      <span class="code-attribute">connectionStringName</span><span class="code-keyword">="</span><span class="code-keyword">DefaultConnection"</span> <span class="code-attribute">enablePasswordRetrieval</span><span class="code-keyword">="</span><span class="code-keyword">false"</span> 
+      <span class="code-attribute">enablePasswordReset</span><span class="code-keyword">="</span><span class="code-keyword">true"</span> <span class="code-attribute">requiresQuestionAndAnswer</span><span class="code-keyword">="</span><span class="code-keyword">false"</span> 
+      <span class="code-attribute">requiresUniqueEmail</span><span class="code-keyword">="</span><span class="code-keyword">false"</span> <span class="code-attribute">maxInvalidPasswordAttempts</span><span class="code-keyword">="</span><span class="code-keyword">5"</span> 
+      <span class="code-attribute">minRequiredPasswordLength</span><span class="code-keyword">="</span><span class="code-keyword">6"</span> <span class="code-attribute">minRequiredNonalphanumericCharacters</span><span class="code-keyword">="</span><span class="code-keyword">0"</span> 
+      <span class="code-attribute">passwordAttemptWindow</span><span class="code-keyword">="</span><span class="code-keyword">10"</span> <span class="code-attribute">applicationName</span><span class="code-keyword">="</span><span class="code-keyword">/"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+  <span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">providers</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">membership</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-leadattribute">roleManager</span> <span class="code-attribute">defaultProvider</span><span class="code-keyword">="</span><span class="code-keyword">DefaultRoleProvider"</span><span class="code-keyword">&gt;</span>
+  <span class="code-keyword">&lt;</span><span class="code-leadattribute">providers</span><span class="code-keyword">&gt;</span>
+    <span class="code-keyword">&lt;</span><span class="code-leadattribute">add</span> <span class="code-attribute">name</span><span class="code-keyword">="</span><span class="code-keyword">DefaultRoleProvider"</span> 
+      <span class="code-attribute">type</span><span class="code-keyword">="</span><span class="code-keyword">System.Web.Providers.DefaultRoleProvider, System.Web.Providers, 
+            Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"</span> 
+      <span class="code-attribute">connectionStringName</span><span class="code-keyword">="</span><span class="code-keyword">DefaultConnection"</span> <span class="code-attribute">applicationName</span><span class="code-keyword">="</span><span class="code-keyword">/"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+  <span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">providers</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">roleManager</span><span class="code-keyword">&gt;</span>
+</pre>
+<p>As I won’t be using any providers in my sample application at all, I don’t want them cluttering up my config file.</p>
+<h3>2. Add the following sections to the Web.config file inside the configsections element</h3>
+<p>(Note, if any of them are already there, you do not need to add them twice.)</p>
+<pre lang="xml"><span class="code-keyword">&lt;</span><span class="code-leadattribute">section</span> <span class="code-attribute">name</span><span class="code-keyword">="</span><span class="code-keyword">system.identityModel"</span> 
+  <span class="code-attribute">type</span><span class="code-keyword">="</span><span class="code-keyword">System.IdentityModel.Configuration.SystemIdentityModelSection, System.IdentityModel, 
+        Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-leadattribute">section</span> <span class="code-attribute">name</span><span class="code-keyword">="</span><span class="code-keyword">system.identityModel.services"</span> 
+   <span class="code-attribute">type</span><span class="code-keyword">="</span><span class="code-keyword">System.IdentityModel.Services.Configuration.SystemIdentityModelServicesSection, 
+        System.IdentityModel.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-leadattribute">section</span> <span class="code-attribute">name</span><span class="code-keyword">="</span><span class="code-keyword">membershipReboot"</span> 
+   <span class="code-attribute">type</span><span class="code-keyword">="</span><span class="code-keyword">BrockAllen.MembershipReboot.SecuritySettings, BrockAllen.MembershipReboot"</span><span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-leadattribute">section</span> <span class="code-attribute">name</span><span class="code-keyword">="</span><span class="code-keyword">entityFramework"</span> 
+   <span class="code-attribute">type</span><span class="code-keyword">="</span><span class="code-keyword">System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, 
+         Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> 
+   <span class="code-attribute">requirePermission</span><span class="code-keyword">="</span><span class="code-keyword">false"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+</pre>
+<p>By adding those sections, we are making configuration elements available for use in this 
+<em>Web.config</em> file. Note the section with the <code>name</code> 
+attribute <code>membershipReboot</code>. That config section comes from the MembershipReboot project (which is evident from the <code>type</code> attribute on that element).</p>
+<h3>3. Add the ConnectionString for the Database</h3>
+<p>This is to connect to the database which you created above, to store the authentication information.</p>
+<pre lang="xml"><span class="code-keyword">&lt;</span><span class="code-leadattribute">connectionStrings</span><span class="code-keyword">&gt;</span>
+    <span class="code-keyword">&lt;</span><span class="code-leadattribute">add</span> <span class="code-attribute">name</span><span class="code-keyword">="</span><span class="code-keyword">MembershipReboot"</span> 
+      <span class="code-attribute">connectionString</span><span class="code-keyword">="</span><span class="code-keyword">server=localhost;database=MembershipReboot;trusted_connection=yes;"</span> 
+      <span class="code-attribute">providerName</span><span class="code-keyword">="</span><span class="code-keyword">System.Data.SqlClient"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">connectionStrings</span><span class="code-keyword">&gt;</span> </pre>
+<h3>4. Make sure that the following section is in the Web.config file as a child of the &lt;system.web&gt; element</h3><pre lang="xml"><span class="code-keyword">&lt;</span><span class="code-leadattribute">authentication</span> <span class="code-attribute">mode</span><span class="code-keyword">="</span><span class="code-keyword">Forms"</span><span class="code-keyword">&gt;</span>
+      <span class="code-keyword">&lt;</span><span class="code-leadattribute">forms</span> <span class="code-attribute">loginUrl</span><span class="code-keyword">="</span><span class="code-keyword">~/Admin/Login"</span> <span class="code-attribute">timeout</span><span class="code-keyword">="</span><span class="code-keyword">2880"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">authentication</span><span class="code-keyword">&gt;</span> </pre>
+<p>That element configures the application to use <em>Forms Authentication</em> and it causes a redirect to the route <strong>/Admin/Login</strong> in cases where the user is not yet authenticated. Note that I have added a controller called <strong>Admin</strong> with a view called <strong>Index</strong>. I deliberately chose the <strong>basic</strong>
+ template when I created this solution because I did not want any 
+authentication code to be freshly baked already, when I created the 
+solution.</p>
+<p>This is the state of the code at the end of Stage 1 in the download code. If you now make sure the <code>ConnectionString</code>
+ is pointing to your instance of the database, and run up the 
+application (using the Stage 1 code), you will find a page requesting 
+you to enter a message. Enter a message in the text box and click the 
+button. You should be immediately redirected to the Login page. We now 
+have the absolute beginnings of the authentication code for our 
+application.</p>
+<p>Quickly take a look at the <code>Login</code> Action method of the <code>AdminController</code>.
+ I pretty much copied that verbatim from the example application which 
+comes with the MembershipReboot source code. Note that I have not used 
+an IOC container to take care of dependency injection for the <code>UserAuthenticationService</code> or the <code>ClaimsBasedAuthenticationService</code>,
+ as I did not want to distract from the key purpose of this article. In 
+the real world, those services would be injected using an IOC container.
+ I will clean this up and add proper dependency injection in the final 
+version of the sample app.</p>
+<p>Now we have to do some configuration of MembershipReboot and set up 
+the Session Authentication Module (SAM) so that authentication 
+information can persist across requests.</p>
+<h2>Finishing off the Authentication Part</h2>
+<p>We now need to add the MembershipReboot section. Note, this is <strong>not</strong>
+ a provider and is not to be mistaken for one of the traditional ASP.NET
+ providers. This is a custom config section which is part of the 
+MembershipReboot library. 
+This needs to be added as a child element to the configuration element:</p>
+<pre lang="xml"><span class="code-keyword">&lt;</span><span class="code-leadattribute">membershipReboot</span>
+    <span class="code-attribute">connectionStringName</span><span class="code-keyword">="</span><span class="code-keyword">MembershipReboot"</span> 
+    <span class="code-attribute">requireAccountVerification</span><span class="code-keyword">="</span><span class="code-keyword">true"</span>
+    <span class="code-attribute">emailIsUsername</span><span class="code-keyword">="</span><span class="code-keyword">false"</span>
+    <span class="code-attribute">multiTenant</span><span class="code-keyword">="</span><span class="code-keyword">false"</span>
+    <span class="code-attribute">passwordHashingIterationCount</span><span class="code-keyword">="</span><span class="code-keyword">0"</span>
+    <span class="code-attribute">accountLockoutDuration</span><span class="code-keyword">="</span><span class="code-keyword">00:01:00"</span>
+    <span class="code-attribute">passwordResetFrequency</span><span class="code-keyword">="</span><span class="code-keyword">0"</span>
+<span class="code-keyword">/</span><span class="code-keyword">&gt;</span> </pre>
+<p>It is a means by which we can configure the behaviour of MembershipReboot. Other options include:</p>
+<ol><li><code>allowAccountDeletion</code></li><li><code>emailIsUsername</code></li><li>
+	<code>requireAccountVerification</code></li><li><code>allowLoginAfterAccountCreation</code></li></ol>
+<p>Obviously, the <code>connectionStringName</code> needs to be set so 
+that the MembershipReboot library can access the database tables which 
+we created earlier. That library uses EntityFramework 5 as its ORM. 
+However, being open source, you are free to completely rewrite the data 
+access code of the MembershipReboot library.</p>
+<p>The next thing that we need to add to the <em>Web.config</em> is the <strong>SAM</strong> element, under the <code>system.WebServer</code> element:</p>
+<pre lang="xml"><span class="code-keyword">&lt;</span><span class="code-leadattribute">modules</span><span class="code-keyword">&gt;</span>
+      <span class="code-keyword">&lt;</span><span class="code-leadattribute">add</span> <span class="code-attribute">name</span><span class="code-keyword">="</span><span class="code-keyword">SessionAuthenticationModule"</span> 
+        <span class="code-attribute">type</span><span class="code-keyword">="</span><span class="code-keyword">System.IdentityModel.Services.SessionAuthenticationModule, 
+              System.IdentityModel.Services, Version=4.0.0.0, Culture=neutral, 
+              PublicKeyToken=b77a5c561934e089"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>      
+<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">modules</span><span class="code-keyword">&gt;</span> </pre><p>The <code>SessionAuthenticationModule</code>
+ enables us to persist the authentication credentials across http 
+requests. (As this is overriding an IIS setting, you will need to use 
+IIS Express at the very least with your project. Cassini won’t cut it. 
+The sample code uses IIS Express.)</p>
+<p>The last thing I need to add to <em>Web.config</em> is the following section:</p>
+<pre lang="xml"><span class="code-keyword">&lt;</span><span class="code-leadattribute">system.identitymodel.services</span><span class="code-keyword">&gt;</span>
+    <span class="code-keyword">&lt;</span><span class="code-leadattribute">federationconfiguration</span><span class="code-keyword">&gt;</span>
+      <span class="code-keyword">&lt;</span><span class="code-leadattribute">cookiehandler</span> <span class="code-attribute">requiressl</span><span class="code-keyword">="</span><span class="code-keyword">false"</span><span class="code-keyword">&gt;</span>
+    <span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">cookiehandler</span><span class="code-keyword">&gt;</span><span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">federationconfiguration</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">system.identitymodel.services</span><span class="code-keyword">&gt;</span> </pre>
+<p>Ideally, if this was a public-facing application, we would be using a
+ certificate for encryption of the cookie which we are using for 
+authentication (as Google does for its search page – it encrypts 
+searches). However, I won’t go to the trouble of a self-signed 
+certificate here and will settle for no ssl and an unprotected cookie 
+(for the purposes of this sample application).</p>
+<p>I will now demonstrate the way SAM persists those credentials with the assistance of some screenshots of Fiddler:</p>
+<p><img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/FiddlerNotAuthenticated.png"></p>
+<div class="Caption">Figure 1 – shows the request after I had entered 
+some text and clicked the Submit Message button. As I am not yet 
+authenticated, 
+I am redirected to the Login page (as normal with Forms authentication).
+ You can see the 302 redirect at request 10 in the trace window on the 
+left.</div>
+<p><img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/FiddlerAuthenticated.png"></p>
+<div class="Caption">Figure 2 – I have selected the request numbered 15 
+in the trace window. You can see in the Response window the values of 
+the cookies which have been issued 
+by SAM when I successfully authenticated using the valid password with 
+my username and clicking the Log In button.</div>
+<p><img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/FiddlerAuthenticatedRequest.png"></p>
+<div class="Caption">Figure 3 - after having logged in, in subsequent 
+requests you can see the cookies being sent with them. Those cookies 
+also contain all the claims of the logged-in user. 
+More on that later.</div>
+<p>If you now open Stage 2 of the download code, we have implemented 
+basic authentication using the MembershipReboot library. The usage is as
+ follows:</p>
+<ol><li>When you first load the application, you will be accessing it as
+ an anonymous user. Then, enter a message in the text box and click the 
+submit button.</li><li>This will redirect you to the Login page at which
+ you enter your login details. Enter the username and password for your 
+user and you will be taken back to the original screen.</li><li>You can click the Logout link to log out. Then log back in again, just to confirm all is working as it should be.</li></ol>
+<p>Note: there are some great extensions out there for the browsers which clears cookies. I use <a href="https://chrome.google.com/webstore/detail/clickclean/ghgabhipcejejjmhhchfonmamedcbeod?hl=en">Click&amp;Clean</a>
+ for Chrome. You'll find these handy when working through this article, 
+at those times where you need to clear the browser's cookies when 
+playing around with the code.</p>
+<h2>Authorization - Preliminary</h2>
+<p>Now we move on to authorization. That is, security measures which 
+dictate whether an operation can be performed given the required 
+combination of <em><strong>Claims</strong></em> held by the principal, the <em><strong>Action</strong></em> being executed and the <em><strong>Resource</strong></em>
+ involved. The idea being, to evaluate whether a Principle with certain 
+claims is permitted to perform an action on a particular resource/s. To 
+couch that like an equation:</p>
+<pre lang="text">Evaluate if <strong>a principal with claims x</strong> is permitted to do <strong>action </strong>y on <strong>resource </strong>z  </pre>
+<p>(taken from one of Dominick Baier’s comments on <a title="Blog comment Dominick Baier" href="http://leastprivilege.com/2012/10/26/using-claims-based-authorization-in-mvc-and-web-api/comment-page-1/" target="_blank">this blog post</a>).</p>
+<h2>Getting Started with Thinktecture.IdentityModel</h2><p>
+<a title="Thinktecture.IdentityModel" href="https://github.com/thinktecture/Thinktecture.IdentityModel.45" target="_blank">Thinktecture.IdentityModel</a>
+ is an excellent library which provides an abundance of helper methods 
+which make authorization in a claims-aware environment quite 
+straightforward (although, it did take a while for me to put all of the 
+pieces together).</p><p>First, we need to bring down Thinktecture.IdentityModel using Nuget. You will have noticed that to get the redirect from the <code>HomeController</code> to the <code>AdminController </code>in the previous stages, I decorated the 2nd Index method of the <code>HomeController</code> with an <code>Authorize</code>
+ attribute. That attribute only supports the old way of doing things. If
+ you want to incorporate claims-aware authorization, you need to inherit
+ from that class. And that is exactly what the <code>ClaimsAuthorize</code> attribute in <code>Thinktecture.IdentityModel</code> does.</p>
+<p>In Stage 3 code, you will see I have decorated that action method with the as follows:</p><pre lang="cs">[ClaimsAuthorize(<span class="code-string">"</span><span class="code-string">Write"</span>, <span class="code-string">"</span><span class="code-string">ImportantMessage"</span>)]
+[HttpPost]
+<span class="code-keyword">public</span> ActionResult Index(<span class="code-keyword">string</span> message)
+{
+    <span class="code-keyword">return</span> View();
+} </pre><p>The next bit is really important and it demonstrates how you 
+can externalise your authorization logic. We need to write a class which
+ inherits from <code>ClaimsAuthorizationManager</code> (which lives in the <code>System.Security.Claims</code> namespace). There is a method called <code>CheckAccess</code>
+ which we need to override. In this method, as far as authorization 
+goes, the world is your oyster. That’s the beauty of this approach to 
+authorization. You’re freed up to perform any kind of checks you want. 
+You can hit a data store for data that determines the permission rights 
+for a scenario.</p>
+<p>The class which I have created to do this authorization is as follows:</p>
+<pre lang="cs"><span class="code-keyword">public</span> <span class="code-keyword">class</span> AreWeAllowedToDoItManager : ClaimsAuthorizationManager
+{
+  <span class="code-keyword">public</span> <span class="code-keyword">override</span> <span class="code-keyword">bool</span> CheckAccess(AuthorizationContext context)
+  {
+    <span class="code-keyword">var</span> resource = context.Resource.First().Value;
+    <span class="code-keyword">var</span> claims = context.Principal.Claims.ToList();
+ 
+    <span class="code-keyword">switch</span> (resource)
+    {
+      <span class="code-keyword">case</span> <span class="code-string">"</span><span class="code-string">ImportantMessage"</span>:
+      {
+        <span class="code-keyword">if</span> (PrincipalCanPerformActionOnResource(context))
+          <span class="code-keyword">return</span> <span class="code-keyword">true</span>;
+        <span class="code-keyword">break</span>;
+      }
+      <span class="code-keyword">default</span>:
+      {
+        <span class="code-keyword">throw</span> <span class="code-keyword">new</span> NotSupportedException(<span class="code-keyword">string</span>.Format(<span class="code-string">"</span><span class="code-string">{0} is not a valid resoure"</span>, resource));
+      }
+    }
+ 
+    <span class="code-keyword">return</span> <span class="code-keyword">false</span>;
+  }
+ 
+  <span class="code-keyword">private</span> <span class="code-keyword">bool</span> PrincipalCanPerformActionOnResource(AuthorizationContext context)
+  {
+    <span class="code-keyword">var</span> action = context.Action.First().Value;
+ 
+    <span class="code-keyword">switch</span> (action)
+    {
+      <span class="code-keyword">case</span> <span class="code-string">"</span><span class="code-string">Write"</span>:
+      {
+        <span class="code-keyword">if</span> (context.Principal.HasClaim(<span class="code-string">"</span><span class="code-string">http://dave.com/ws/identity/claims/messenger"</span>, 
+                                       <span class="code-string">"</span><span class="code-string">ImportantMessenger"</span>))
+        {
+          <span class="code-keyword">return</span> <span class="code-keyword">true</span>;
+        }
+        <span class="code-keyword">break</span>;
+      }
+      <span class="code-keyword">default</span>:
+      {
+        <span class="code-keyword">throw</span> <span class="code-keyword">new</span> NotSupportedException(<span class="code-keyword">string</span>.Format(<span class="code-string">"</span><span class="code-string">{0} is not a valid action"</span>, action));
+      }
+    }
+ 
+    <span class="code-keyword">return</span> <span class="code-keyword">false</span>;
+  }
+}</pre>
+<p>And I wired it up in the <em>Web.config</em> file as follows (as a child element to the <code>Configuration</code> element):</p>
+<pre lang="xml"><span class="code-keyword">&lt;</span><span class="code-leadattribute">system.identityModel</span><span class="code-keyword">&gt;</span>
+  <span class="code-keyword">&lt;</span><span class="code-leadattribute">identityConfiguration</span><span class="code-keyword">&gt;</span>  
+    <span class="code-keyword">&lt;</span><span class="code-leadattribute">claimsAuthorizationManager</span> <span class="code-attribute">type</span><span class="code-keyword">="</span><span class="code-keyword">ClaimsAspMvc.AreWeAllowedToDoItManager, ClaimsAspMvc"</span> <span class="code-keyword">/</span><span class="code-keyword">&gt;</span>
+  <span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">identityConfiguration</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">system.identityModel</span><span class="code-keyword">&gt;</span></pre>
+<p>In the project (the Stage 3 project), you will see that I have created a <code>Messenger</code> constant in a class called <code>CustomClaimTypes</code> which has the following value: <em>"http://dave.com/ws/identity/claims/messenger"</em>.
+ As I am making up the Claim, I can make up the URI! That's all the 
+ClaimTypes constants resolve to - URI strings. The URIs which Microsoft 
+has created for <code>ClaimTypes</code> <a href="http://msdn.microsoft.com/en-us/library/system.identitymodel.claims.claimtypes.aspx"> can be viewed here</a>.</p>
+<p>Now, you can just add that claim to the <strong>UserClaims</strong> table in the database. Using the db backend, just add the user's Id in the <strong>UserAccountID</strong> column, the URI from that constant in the <strong>Type</strong> column and the value "ImportantMessenger" in the <strong>Value</strong> column.</p>
+<table class="ArticleTable"><thead><tr><th>UserAccountID</th>
+<th>Type</th><th>Value</th></tr></thead>
+<tbody><tr><td>3</td><td>http://dave.com/ws/identity/claims/messenger</td><td>ImportantMessenger</td></tr></tbody></table>
+<p>We know from the <code>CheckAccess</code> method of the <code>AreWeAllowedToDoItManager</code> that the fact being verified is:</p>
+<pre lang="text">Evaluate if the current user with a <strong>Messenger claim of ImportantMessenger</strong> 
+         is permitted to do a <strong>Write</strong> action on the <strong>ImportantMessage </strong>resource</pre>
+<p>So, open Stage 3 of the download code, making sure the user you are 
+using is logged out (either log them out or clear the browser's 
+cookies). Then, follow these steps:</p>
+<ol>
+<li>Enter a message and click the Submit Message button and behold as it
+ transfers you the Login page. As the anonymous user does not have the 
+Claim <code>CustomClaimTypes.Messenger</code>, it cannot access the Index action (the HttpPost version) on the HomeController.</li>
+<li>Log in. You will then be re-directed back to the Index page with a 302 request.</li>
+<li>Type a message in the input box and click the Submit Message button. You should see the message appear below the input box.</li>
+</ol>
+<p>Success! The authenticated user has passed the authorization check with flying colors.</p>
+<p>Another way you can test this out is by attempting to "submit a message" with a logged-in user who does <strong>not</strong> have the <code>CustomClaimTypes.Messenger</code> 
+claim. Proceed with that and verify that the user keeps getting re-directed back to the Login page for a failure to pass the <code>ClaimsAuthorize</code> check.</p>
+<p>At some point, I'll add a page to the project where you can add claims for a user in the front-end.
+I have only scratched the surface with this library and will be very interested to explore its plethora of features.</p>
+<h2>A Few Final Comments/Observations</h2>
+<h3>Roles-Based Checks – If you Really Must</h3><p>If, for one reason or another you need to use Roles-based authorization, the new <code>System.IdentityModel</code> API supports the traditional way of doing that with an object implementing the <code>IPrincipal</code> interface. To demonstrate, you could add the following code into the 
+	<em>Index.cshtml</em>:</p><pre lang="cs"><span class="code-keyword">if</span>(User.Identity.IsAuthenticated)
+{
+  &lt;text&gt;Hello <span class="code-keyword">&lt;/</span><span class="code-leadattribute">text</span><span class="code-keyword">&gt;</span>@User.Identity.Name<span class="code-keyword">&lt;</span><span class="code-leadattribute">text</span><span class="code-keyword">&gt;</span>, 
+    you are logged in!<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">text</span><span class="code-keyword">&gt;</span> @Html.ActionLink("Logout", "LogOut", "Home")
+
+  System.Security.Claims.ClaimsPrincipal cp = new ClaimsPrincipal(User.Identity);
+
+  if (cp.IsInRole("Maintainer"))
+  {
+    <span class="code-keyword">&lt;</span><span class="code-leadattribute">div</span><span class="code-keyword">&gt;</span>If you can see this, you are logged in and in the Maintainer role.<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">div</span><span class="code-keyword">&gt;</span>
+  }
+}  </pre>
+<p>The roles API will apply for any claim with the URI in that table (which is what the <code>ClaimTypes.Role</code> constant resolves to) and which has a value "Maintainers".</p>
+<p>Then, you could add a user to that role by adding a row to the UserClaims table as follows:</p>
+<table class="ArticleTable"><thead><tr>
+	<th>UserAccountID</th><th>Type</th><th>Value</th></tr></thead><tbody><tr><td>3</td><td>
+			<a href="http://schemas.microsoft.com/ws/2008/06/identity/claims/role">http://schemas.microsoft.com/ws/2008/06/identity/claims/role</a></td>
+		<td>Maintainers</td></tr></tbody></table><p>The important take-away here is that the Roles API still works with the new ClaimsPrincipal class and such methods as <code>IsInRole</code> can still be used.</p>
+<h3>AntiForgeryTokens and the CreateUser Screen</h3>
+<p>If you add an AntiForgeryToken to your CreateUser screen (as you should), you'll find that the following <code>InvalidOperationException</code> will be thrown:</p>
+<pre lang="text">A claim of type 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier' or 
+'http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider' was not present 
+on the provided ClaimsIdentity. To enable anti-forgery token support with claims-based authentication, 
+please verify that the configured claims provider is providing both of these claims 
+on the ClaimsIdentity instances it generates. If the configured claims provider instead 
+uses a different claim type as a unique identifier, it can be configured by setting 
+the static property AntiForgeryConfig.UniqueClaimTypeIdentifier.</pre>
+<p>There are two ways to proceed with the successful validation of the AntiForgeryTokens and having no AntiForgeryTokens-related 
+<code>InvalidOperationException</code> being thrown. And those two ways are explained really clearly in the error message itself:</p>
+<ol><li>The 1st thing you could do would be to add either of the following claims to the principal's Claims collection:
+<ol><li>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier</li><li>http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider</li></ol>
+This is the harder road to go down and there would have to be a pretty compelling reason NOT to go with the 2nd approach below.</li>
+<li>The 2nd thing you can do is to add the following line of code to the <code>Application_Start</code> method of the 
+<code>MvcApplication</code> class (in <em>Global.asax.cs</em>):
+<pre lang="cs">AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.Name;</pre>
+(As that is the ClaimType we are using here as the unique identifier of 
+the User. If you were using the email address, you would assign 
+<code>ClaimTypes.Email</code>).</li></ol>
+<h3>Cookie Size - Does it Need Every Claim?</h3>
+<p>Looking back at <strong>Figure 2</strong>, we can see that the 
+payload is pretty big, as it is carrying all of the Claims information 
+for the authenticated user. Before Claims, the cookie only contained a 
+name and password. If you do not need all of the claims information in 
+the cookie, there is a way of turning that feature off (so to speak).</p>
+<p>In the <code>MvcApplication</code> class, you need to override the <code>Init()</code> method and add the following code:</p>
+<pre lang="cs"><span class="code-keyword">public</span> <span class="code-keyword">override</span> <span class="code-keyword">void</span> Init()
+{
+    <span class="code-keyword">var</span> sam = FederatedAuthentication.SessionAuthenticationModule;
+    sam.IsReferenceMode = <span class="code-keyword">true</span>;
+}</pre>
+<p>This enables server-side caching of session tokens and is explained by Brock Allen in <a title="server-side caching of session tokens" href="http://brockallen.com/2013/02/10/beware-setting-properties-or-registering-events-on-the-sam-and-fam/" target="_blank">this blog post</a>. That resulted in a reduction in cookie-size to 558 bytes (down from 2026 bytes)</p>
+<h3>Configuring SMTP for Emails</h3>
+<p>Part and parcel of authentication/authorization schemes is the 
+ability to reset passwords, confirm the creation of new users and other 
+such tasks. In the final code, I have used the 
+<code>NotificationService</code> class that is part of the MembershipReboot library. That allowed me to simply configure the SMTP server in the 
+<em>Web.config</em> as follows:</p>
+<pre lang="xml"><span class="code-keyword">&lt;</span><span class="code-leadattribute">system.net</span><span class="code-keyword">&gt;</span>
+    <span class="code-keyword">&lt;</span><span class="code-leadattribute">mailsettings</span><span class="code-keyword">&gt;</span>
+      <span class="code-keyword">&lt;</span><span class="code-leadattribute">smtp</span> <span class="code-attribute">from</span><span class="code-keyword">="</span><span class="code-keyword">somesecureguy@gmail.com"</span><span class="code-keyword">&gt;</span>
+        <span class="code-keyword">&lt;</span><span class="code-leadattribute">network</span> <span class="code-attribute">host</span><span class="code-keyword">="</span><span class="code-keyword">smtp.gmail.com"</span> <span class="code-attribute">username</span><span class="code-keyword">="</span><span class="code-keyword">somesecureguy@gmail.com"</span> 
+                <span class="code-attribute">password</span><span class="code-keyword">="</span><span class="code-keyword">1C8(3*8b%$Et7y"</span> <span class="code-attribute">port</span><span class="code-keyword">="</span><span class="code-keyword">587"</span> <span class="code-attribute">enablessl</span><span class="code-keyword">="</span><span class="code-keyword">true"</span><span class="code-keyword">&gt;</span>
+      <span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">network</span><span class="code-keyword">&gt;</span><span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">smtp</span><span class="code-keyword">&gt;</span>
+    <span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">mailsettings</span><span class="code-keyword">&gt;</span>
+<span class="code-keyword">&lt;</span><span class="code-keyword">/</span><span class="code-leadattribute">system.net</span><span class="code-keyword">&gt;</span></pre>  
+<p>Those details should work out-of-the box for you, or at least until 
+Google cancels that account (which I only set up for this article).</p>
+<h2>Final Thoughts</h2>
+<p>I have only touched the surface with these two libraries and with 
+this Claims stuff. Obviously, because these libraries are open source, 
+it makes it very easy to tailor this stuff to your needs. I plan to 
+evolve the final code of this example into a more interesting example. 
+But for the time being, it provides a satisfactory vehicle for 
+showcasing the basics of these libraries.</p><p>I hope you enjoy playing with them as much as I have!</p>
+<ul class="download">
+	<li>
+	<a title="code" href="https://skydrive.live.com/redir?resid=FDC978B63E696199%21500" target="_blank">Download 
+	code</a></li>
+</ul>
+<h2>History</h2>
+<h3>Article</h3>
+<table><tbody><tr>
+	<td width="80"><strong>Version</strong></td><td width="110"><strong>Date</strong></td><td><strong>Summary</strong></td></tr><tr><td>1.0</td><td>01 Sep. 2013</td>
+		<td>Original published article.</td></tr><tr><td>1.1</td><td>13 Sep. 2013</td>
+		<td>Added update about ASP.NET Identity.</td></tr></tbody></table>
+<h3>Code</h3>
+<table><tbody><tr><td width="80"><strong>Version</strong></td><td><strong>Date</strong></td></tr><tr><td>1.0</td><td>01 Sep. 2013</td></tr></tbody></table>
+
+
+							</div>
+							
+
+							
+							
+							<h2>License</h2>
+							<div id="LicenseTerms"><p>This article, along with any associated source code and files, is licensed under <a href="http://www.codeproject.com/info/cpol10.aspx" rel="license">The Code Project Open License (CPOL)</a></p></div>
+							
+
+							<div class="float-right" style="margin:20px 0 0 0;border:1px solid #ccc">
+							
+							</div>
+
+							
+							<h2 id="ctl00_AboutHeading">About the Author</h2>
+							
+
+<div class="container">
+<div style="width:210px;overflow:hidden;float:left;text-align:center">
+	<img id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberPhoto" class="profile-pic" src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/4a05d58f-2122-401a-81f2-454a4d89e9a7.jpg" style="border-width:0px;transform:rotate(-3deg);">
+</div>
+<div class="container-member float-left" style="width:235px">
+	<b><a id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberProfileLink" class="author" href="http://www.codeproject.com/Members/DaveRogersDev">David Rogers Dev</a></b>
+	<div class="company">
+		<span id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberJobTitle">Software Developer</span>
+		<span id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberCompany"></span> 
+		<br><span id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberLocation">Australia <img src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/AU.gif" alt="Australia" height="11px" width="16px"></span>
+	</div>
+</div>
+	
+<div class="padded-top float-left clearfix" style="width:600px">
+	A mid-level developer writing .NET code to provide business solutions to a wide range of customer requirements.
+
+	
+
+	
+</div>
+</div><br>
+							
+							
+
+							<div class="clearfix"></div>
+
+							<div style="padding-top:8px">
+								
+							</div>
+
+
+						
+						<div style="margin:auto;height:90px;margin-top:10px"> 
+							
+						</div>
+						
+					
+
+					</form>
+
+				</div>
+
+				
+					
+					<h2>Comments and Discussions</h2>
+					
+					<p><img alt="Comment" src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/NewComment.gif" height="16px" width="12px">
+					<b>9 messages</b> have been posted for this article 
+					Visit <b><a id="ctl00_ArticleLink" href="http://www.codeproject.com/Articles/639458/Claims-Based-Authentication-and-Authorization">http://www.codeproject.com/Articles/639458/Claims-Based-Authentication-and-Authorization</a></b> to post and view comments on 
+					this article, or click <b><a id="ctl00_PrintWithMessage" href="http://www.codeproject.com/Articles/639458/Claims-Based-Authentication-and-Authorization?display=PrintAll">here</a></b> 
+					to get a print view with messages.</p>
+					
+
+				
+
+			</div>
+			
+		</td>
+		<td>
+			
+		</td>
+		</tr></tbody></table>
+
+		
+		<div class="theme1-background" style="height:2px"></div>
+
+		<div class="extended tiny-text">
+			<div class="row">
+				<div class="float-left">
+					<a id="ctl00_PermaLink" itemprop="url" href="http://www.codeproject.com/Articles/639458/Claims-Based-Authentication-and-Authorization">Permalink</a> | 
+					<a id="ctl00_AdvertiseLink" href="http://developermedia.com/">Advertise </a> |
+					<a id="ctl00_PrivacyLink" href="http://www.codeproject.com/info/privacy.aspx">Privacy</a> |
+					<a id="ctl00_Mobile" rel="nofollow" href="http://www.codeproject.com/Articles/639458/Claims-Based-Authentication-and-Authorization?display=Mobile">Mobile</a>
+					<br>
+								
+					
+					Web04 |
+					2.7.131126.1 |
+					Last Updated 12 Sep 2013								
+				</div>
+				<div class="float-right align-right">
+					Article Copyright 2013 by David Rogers Dev<br>Everything else
+					Copyright © <a href="mailto:webmaster@codeproject.com">CodeProject</a>, 1999-2013 <br>
+					<a id="ctl00_TermsOfUseLink" href="http://www.codeproject.com/info/TermsOfUse.aspx">Terms of Use</a>
+				</div>
+
+				
+
+			</div>
+		</div>
+		
+
+		<br clear="all">
+		
+			
+
+	</div> 
+	</div>
+</div>
+
+
+<div style="display:none;" id="lqm_AdTable">
+	
+</div>
+
+
+<script type="text/javascript" language="Javascript" src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/jquery.js"></script><script type="text/javascript">//<![CDATA[
+if (typeof jQuery == 'undefined') {
+    document.write(unescape("%3Cscript src='/script/JS/jquery-1.6.2.min.js' type='text/javascript' %3E%3C/script%3E"));
+}//]]></script>
+<script type="text/javascript" language="Javascript" src="Claims-Based%20Authentication%20and%20Authorization%20-%20CodeProject_files/MemberProfilePopup.js"></script>
+<script type="text/javascript" language="Javascript">//<![CDATA[
+$(document).ready(function() { anchorAnimate(); });
+$(document).ready(function() {   $('.alert-bar').fadeIn('slow');   $('.alert-bar a.close-notify').click(function() {      $('.alert-bar').fadeOut('fast');        return false;    });});
+
+//]]>
+</script>
+
+
+
+<div style="display: none; position: absolute;" id="MemberProfilePopupDiv" class="raised box"></div><div style="display: none; position: absolute;" id="MemberProfilePopupDiv" class="raised box"></div><div style="display: none; position: absolute;" id="MemberProfilePopupDiv" class="raised box"></div></body></html>
