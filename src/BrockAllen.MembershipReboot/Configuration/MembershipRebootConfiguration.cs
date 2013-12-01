@@ -4,10 +4,13 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace BrockAllen.MembershipReboot
 {
-    public class MembershipRebootConfiguration
+    public class MembershipRebootConfiguration<TAccount>
+        where TAccount : UserAccount
     {
         public MembershipRebootConfiguration()
             : this(SecuritySettings.Instance)
@@ -29,6 +32,8 @@ namespace BrockAllen.MembershipReboot
             this.AllowAccountDeletion = securitySettings.AllowAccountDeletion;
             this.PasswordHashingIterationCount = securitySettings.PasswordHashingIterationCount;
             this.PasswordResetFrequency = securitySettings.PasswordResetFrequency;
+
+            this.Crypto = new DefaultCrypto();
         }
 
         public bool MultiTenant { get; set; }
@@ -43,26 +48,26 @@ namespace BrockAllen.MembershipReboot
         public int PasswordHashingIterationCount { get; set; }
         public int PasswordResetFrequency { get; set; }
 
-        AggregateValidator usernameValidators = new AggregateValidator();
-        public void RegisterUsernameValidator(params IValidator[] items)
+        AggregateValidator<TAccount> usernameValidators = new AggregateValidator<TAccount>();
+        public void RegisterUsernameValidator(params IValidator<TAccount>[] items)
         {
             usernameValidators.AddRange(items);
         }
-        public IValidator UsernameValidator { get { return usernameValidators; } }
+        public IValidator<TAccount> UsernameValidator { get { return usernameValidators; } }
 
-        AggregateValidator passwordValidators = new AggregateValidator();
-        public void RegisterPasswordValidator(params IValidator[] items)
+        AggregateValidator<TAccount> passwordValidators = new AggregateValidator<TAccount>();
+        public void RegisterPasswordValidator(params IValidator<TAccount>[] items)
         {
             passwordValidators.AddRange(items);
         }
-        public IValidator PasswordValidator { get { return passwordValidators; } }
-        
-        AggregateValidator emailValidators = new AggregateValidator();
-        public void RegisterEmailValidator(params IValidator[] items)
+        public IValidator<TAccount> PasswordValidator { get { return passwordValidators; } }
+
+        AggregateValidator<TAccount> emailValidators = new AggregateValidator<TAccount>();
+        public void RegisterEmailValidator(params IValidator<TAccount>[] items)
         {
             emailValidators.AddRange(items);
         }
-        public IValidator EmailValidator { get { return emailValidators; } }
+        public IValidator<TAccount> EmailValidator { get { return emailValidators; } }
 
         EventBus eventBus = new EventBus();
         public IEventBus EventBus { get { return eventBus; } }
@@ -79,5 +84,20 @@ namespace BrockAllen.MembershipReboot
         }
         
         public ITwoFactorAuthenticationPolicy TwoFactorAuthenticationPolicy { get; set; }
+        public ICrypto Crypto { get; set; }
+        public Func<TAccount, IEnumerable<Claim>> CustomUserPropertiesToClaimsMap { get; set; }
+    }
+    
+    public class MembershipRebootConfiguration : MembershipRebootConfiguration<UserAccount>
+    {
+        public MembershipRebootConfiguration()
+            : this(SecuritySettings.Instance)
+        {
+        }
+
+        public MembershipRebootConfiguration(SecuritySettings securitySettings)
+            : base(securitySettings)
+        {
+        }
     }
 }

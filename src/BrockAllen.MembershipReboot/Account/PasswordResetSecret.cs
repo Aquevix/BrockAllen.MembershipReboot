@@ -16,23 +16,19 @@ namespace BrockAllen.MembershipReboot
         }
 
         [Key]
-        [Column(Order=1)]
-        public virtual Guid ID { get; internal set; }
-        
+        [Column(Order = 1)]
+        public virtual Guid PasswordResetSecretID { get; internal set; }
+
         [Key]
         [Column(Order = 2)]
         public virtual Guid UserAccountID { get; internal set; }
-        
+
         [StringLength(150)]
         [Required]
         public virtual string Question { get; internal set; }
-        
+
         [StringLength(150)]
         [Required]
         public virtual string Answer { get; internal set; }
-
-        [Required]
-        [ForeignKey("UserAccountID")]
-        public virtual UserAccount User { get; internal set; }
     }
 }

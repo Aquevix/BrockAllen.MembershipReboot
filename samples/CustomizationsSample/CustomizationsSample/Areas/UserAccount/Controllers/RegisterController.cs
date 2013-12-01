@@ -7,9 +7,9 @@ namespace BrockAllen.MembershipReboot.Mvc.Areas.UserAccount.Controllers
     [AllowAnonymous]
     public class RegisterController : Controller
     {
-        UserAccountService userAccountService;
-        
-        public RegisterController(UserAccountService userAccountService)
+        UserAccountService<CustomUserAccount> userAccountService;
+
+        public RegisterController(UserAccountService<CustomUserAccount> userAccountService)
         {
             this.userAccountService = userAccountService;
         }
@@ -27,8 +27,14 @@ namespace BrockAllen.MembershipReboot.Mvc.Areas.UserAccount.Controllers
             {
                 try
                 {
-                    this.userAccountService.CreateAccount(model.Username, model.Password, model.Email);
-                    if (userAccountService.Configuration.SecuritySettings.RequireAccountVerification)
+                    var account = this.userAccountService.CreateAccount(model.Username, model.Password, model.Email);
+                    
+                    // add our custom stuff
+                    account.FirstName = model.FirstName;
+                    account.LastName = model.LastName;
+                    this.userAccountService.Update(account);
+
+                    if (userAccountService.Configuration.RequireAccountVerification)
                     {
                         return View("Success", model);
                     }

@@ -4,8 +4,11 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Security.Claims;
 
 namespace BrockAllen.MembershipReboot
 {
@@ -34,9 +37,5 @@ namespace BrockAllen.MembershipReboot
         [Column(Order = 5)]
         [StringLength(150)]
         public virtual string Value { get; internal set; }
-
-        [Required]
-        [ForeignKey("UserAccountID, ProviderName, ProviderAccountID")]
-        public virtual LinkedAccount LinkedAccount { get; internal set; }
     }
 }

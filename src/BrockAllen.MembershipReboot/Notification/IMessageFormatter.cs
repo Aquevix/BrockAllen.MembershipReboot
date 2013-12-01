@@ -7,8 +7,9 @@
 using System.Collections.Generic;
 namespace BrockAllen.MembershipReboot
 {
-    public interface IMessageFormatter
+    public interface IMessageFormatter<TAccount>
+        where TAccount : UserAccount
     {
-        Message Format(UserAccountEvent accountEvent, dynamic extra);
+        Message Format(UserAccountEvent<TAccount> accountEvent, IDictionary<string, string> values);
     }
 }

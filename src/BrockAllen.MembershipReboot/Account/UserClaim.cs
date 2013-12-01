@@ -26,9 +26,5 @@ namespace BrockAllen.MembershipReboot
         [Column(Order = 3)]
         [StringLength(150)]
         public virtual string Value { get; internal set; }
-
-        [Required]
-        [ForeignKey("UserAccountID")]
-        public virtual UserAccount User { get; internal set; }
     }
 }

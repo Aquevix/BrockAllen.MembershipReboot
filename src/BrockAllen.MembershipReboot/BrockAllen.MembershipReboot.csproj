@@ -41,21 +41,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountService\AuthenticationPurpose.cs" />
+    <Compile Include="AccountService\DebuggerEventHandler.cs" />
     <Compile Include="AccountService\PasswordResetQuestionAnswer.cs" />
     <Compile Include="AccountService\UserAccountValidator.cs" />
+    <Compile Include="Account\LinkedAccountClaim.cs" />
     <Compile Include="Account\TwoFactorAuthToken.cs" />
     <Compile Include="Account\PasswordResetSecret.cs" />
     <Compile Include="Authentication\AuthenticationService.cs" />
     <Compile Include="Configuration\RelativePathApplicationInformation.cs" />
+    <Compile Include="Crypto\DefaultCrypto.cs" />
+    <Compile Include="Crypto\ICrypto.cs" />
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
+    <Compile Include="Extensions\LinkedAccountExtensions.cs" />
+    <Compile Include="Extensions\IUserAccountExtensions.cs" />
     <Compile Include="Extensions\X509Certificate2Extensions.cs" />
     <Compile Include="Account\TwoFactorAuthMode.cs" />
     <Compile Include="Groups\Group.cs" />
     <Compile Include="Account\UserCertificate.cs" />
     <Compile Include="Groups\GroupChild.cs" />
     <Compile Include="Groups\GroupService.cs" />
-    <Compile Include="Notification\DynamicDictionary.cs" />
     <Compile Include="Repository\IGroupRepository.cs" />
+    <Compile Include="Repository\IRepository.cs" />
     <Compile Include="Resources\ValidationMessages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -68,23 +74,19 @@
     <Compile Include="Extensions\ClaimsPrincipalExtensions.cs" />
     <Compile Include="Constants\MembershipRebootConstants.cs" />
     <Compile Include="Extensions\DisposableExtensions.cs" />
-    <Compile Include="Account\LinkedAccountClaim.cs" />
     <Compile Include="Account\LinkedAccount.cs" />
-    <Compile Include="Account\UserAccountEvents.cs" />
+    <Compile Include="AccountService\UserAccountEvents.cs" />
     <Compile Include="Account\VerificationKeyPurpose.cs" />
     <Compile Include="Account\UserClaim.cs" />
     <Compile Include="Notification\IMessageFormatter.cs" />
     <Compile Include="Notification\Email\EmailMessageFormatter.cs" />
     <Compile Include="Notification\SMS\SmsNotificationEventHandler.cs" />
     <Compile Include="Notification\SMS\SmsMessageFormatter.cs" />
-    <Compile Include="Repository\EventBusRepository.cs" />
     <Compile Include="Repository\EventBusUserAccountRepository.cs" />
-    <Compile Include="Repository\IRepository.cs" />
     <Compile Include="AccountService\UserAccountValidation.cs" />
     <Compile Include="Bus\EventBus.cs" />
     <Compile Include="Bus\Events.cs" />
     <Compile Include="Crypto\System.Web.Helpers.Crypto.cs" />
-    <Compile Include="Crypto\CryptoHelper.cs" />
     <Compile Include="Configuration\ApplicationInformation.cs" />
     <Compile Include="Notification\Message.cs" />
     <Compile Include="Notification\IMessageDelivery.cs" />
@@ -134,12 +136,12 @@
     <EmbeddedResource Include="Notification\Email\EmailTemplates\EmailChangedEvent_Body.txt" />
     <EmbeddedResource Include="Notification\Email\EmailTemplates\UsernameChangedEvent_Body.txt" />
     <EmbeddedResource Include="Notification\Email\EmailTemplates\PasswordResetRequestedEvent_Body.txt" />
-    <EmbeddedResource Include="Notification\Email\EmailTemplates\AccountVerifiedEvent_Subject.txt" />
-    <EmbeddedResource Include="Notification\Email\EmailTemplates\AccountVerifiedEvent_Body.txt" />
+    <EmbeddedResource Include="Notification\Email\EmailTemplates\EmailVerifiedEvent_Subject.txt" />
+    <EmbeddedResource Include="Notification\Email\EmailTemplates\EmailVerifiedEvent_Body.txt" />
     <EmbeddedResource Include="Notification\Email\EmailTemplates\AccountCreatedEvent_Subject.txt" />
     <EmbeddedResource Include="Notification\Email\EmailTemplates\AccountCreatedEvent_Body.txt" />
     <EmbeddedResource Include="Resources\ValidationMessages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

@@ -49,19 +49,19 @@
     <Content Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DbContextGroupRepository`1.cs" />
+    <Compile Include="DbContextRepository`1.cs" />
+    <Compile Include="DbContextUserAccountRepository`1.cs" />
     <Compile Include="DefaultUserAccountRepository.cs" />
     <Compile Include="DefaultGroupRepository.cs" />
-    <Compile Include="DbContextRepository`1.cs" />
-    <Compile Include="DbContextGroupRepository`1.cs" />
-    <Compile Include="DbContextUserAccountRepository`1.cs" />
     <Compile Include="DefaultMembershipRebootDatabase.cs" />
     <Compile Include="Migrations\201311222357350_InitialCreate.cs" />
     <Compile Include="Migrations\201311222357350_InitialCreate.Designer.cs">
       <DependentUpon>201311222357350_InitialCreate.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201311242107026_v5.cs" />
-    <Compile Include="Migrations\201311242107026_v5.Designer.cs">
-      <DependentUpon>201311242107026_v5.cs</DependentUpon>
+    <Compile Include="Migrations\201311290143004_v5.cs" />
+    <Compile Include="Migrations\201311290143004_v5.Designer.cs">
+      <DependentUpon>201311290143004_v5.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,8 +76,8 @@
     <EmbeddedResource Include="Migrations\201311222357350_InitialCreate.resx">
       <DependentUpon>201311222357350_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201311242107026_v5.resx">
-      <DependentUpon>201311242107026_v5.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201311290143004_v5.resx">
+      <DependentUpon>201311290143004_v5.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -9,11 +9,16 @@ using System.IO;
 
 namespace BrockAllen.MembershipReboot
 {
-    public class EmailMessageFormatter : IMessageFormatter
+    public class EmailMessageFormatter<TAccount> : IMessageFormatter<TAccount>
+        where TAccount: UserAccount
     {
         public class Tokenizer
         {
-            public virtual string Tokenize(UserAccountEvent accountEvent, ApplicationInformation appInfo, string msg, dynamic extra)
+            public virtual string Tokenize(
+                UserAccountEvent<TAccount> accountEvent, 
+                ApplicationInformation appInfo, 
+                string msg, 
+                IDictionary<string, string> values)
             {
                 var user = accountEvent.Account;
 
@@ -25,86 +30,22 @@ namespace BrockAllen.MembershipReboot
                 msg = msg.Replace("{emailSignature}", appInfo.EmailSignature);
                 msg = msg.Replace("{loginUrl}", appInfo.LoginUrl);
 
-                msg = msg.Replace("{confirmAccountCreateUrl}", appInfo.VerifyAccountUrl + extra.VerificationKey);
-                msg = msg.Replace("{cancelNewAccountUrl}", appInfo.CancelNewAccountUrl + extra.VerificationKey);
+                if (values.ContainsKey("VerificationKey"))
+                {
+                    msg = msg.Replace("{confirmPasswordResetUrl}", appInfo.ConfirmPasswordResetUrl + values["VerificationKey"]);
+                    msg = msg.Replace("{confirmChangeEmailUrl}", appInfo.ConfirmChangeEmailUrl + values["VerificationKey"]);
+                    msg = msg.Replace("{cancelVerificationUrl}", appInfo.CancelVerificationUrl + values["VerificationKey"]);
+                }
 
-                msg = msg.Replace("{confirmPasswordResetUrl}", appInfo.ConfirmPasswordResetUrl + extra.VerificationKey);
-                msg = msg.Replace("{confirmChangeEmailUrl}", appInfo.ConfirmChangeEmailUrl + extra.VerificationKey);
+                foreach(var item in values)
+                {
+                    msg = msg.Replace("{" + item.Key + "}", item.Value);
+                }
 
                 return msg;
             }
         }
-        public class EmailChangeRequestedTokenizer : Tokenizer
-        {
-            public override string Tokenize(UserAccountEvent accountEvent, ApplicationInformation appInfo, string msg, dynamic extra)
-            {
-                Func<UserAccountEvent, ApplicationInformation, string, dynamic, string> b = base.Tokenize;
-                var evt = (EmailChangeRequestedEvent)accountEvent;
-                msg = b(accountEvent, appInfo, msg, extra);
-                msg = msg.Replace("{newEmail}", evt.NewEmail);
-                msg = msg.Replace("{oldEmail}", accountEvent.Account.Email);
-                return msg;
-            }
-        }
-        public class EmailChangedTokenizer : Tokenizer
-        {
-            public override string Tokenize(UserAccountEvent accountEvent, ApplicationInformation appInfo, string msg, dynamic extra)
-            {
-                Func<UserAccountEvent, ApplicationInformation, string, dynamic, string> b = base.Tokenize;
-                var evt = (EmailChangedEvent)accountEvent;
-                msg = b(accountEvent, appInfo, msg, extra);
-                msg = msg.Replace("{newEmail}", accountEvent.Account.Email);
-                msg = msg.Replace("{oldEmail}", evt.OldEmail);
-                return msg;
-            }
-        }
-        public class CertificateAddedTokenizer : Tokenizer
-        {
-            public override string Tokenize(UserAccountEvent accountEvent, ApplicationInformation appInfo, string msg, dynamic extra)
-            {
-                var evt = (CertificateAddedEvent)accountEvent;
-                Func<UserAccountEvent, ApplicationInformation, string, dynamic, string> b = base.Tokenize;
-                msg = b(accountEvent, appInfo, msg, extra);
-                msg = msg.Replace("{thumbprint}", evt.Certificate.Thumbprint);
-                msg = msg.Replace("{subject}", evt.Certificate.Subject);
-                return msg;
-            }
-        }
-        public class CertificateRemovedTokenizer : Tokenizer
-        {
-            public override string Tokenize(UserAccountEvent accountEvent, ApplicationInformation appInfo, string msg, dynamic extra)
-            {
-                var evt = (CertificateRemovedEvent)accountEvent;
-                Func<UserAccountEvent, ApplicationInformation, string, dynamic, string> b = base.Tokenize;
-                msg = b(accountEvent, appInfo, msg, extra);
-                msg = msg.Replace("{thumbprint}", evt.Certificate.Thumbprint);
-                msg = msg.Replace("{subject}", evt.Certificate.Subject);
-                return msg;
-            }
-        }
-        public class LinkedAccountAddedTokenizer : Tokenizer
-        {
-            public override string Tokenize(UserAccountEvent accountEvent, ApplicationInformation appInfo, string msg, dynamic extra)
-            {
-                Func<UserAccountEvent, ApplicationInformation, string, dynamic, string> b = base.Tokenize;
-                var evt = (LinkedAccountAddedEvent)accountEvent;
-                msg = b(accountEvent, appInfo, msg, extra);
-                msg = msg.Replace("{provider}", evt.LinkedAccount.ProviderName);
-                return msg;
-            }
-        }
-        public class LinkedAccountRemovedTokenizer : Tokenizer
-        {
-            public override string Tokenize(UserAccountEvent accountEvent, ApplicationInformation appInfo, string msg, dynamic extra)
-            {
-                Func<UserAccountEvent, ApplicationInformation, string, dynamic, string> b = base.Tokenize;
-                var evt = (LinkedAccountRemovedEvent)accountEvent;
-                msg = b(accountEvent, appInfo, msg, extra);
-                msg = msg.Replace("{provider}", evt.LinkedAccount.ProviderName);
-                return msg;
-            }
-        }
-
+       
         public ApplicationInformation ApplicationInformation 
         {
             get
@@ -125,21 +66,14 @@ namespace BrockAllen.MembershipReboot
             this.appInfo = appInfo;
         }
 
-        public Message Format(UserAccountEvent accountEvent, dynamic extra)
+        public Message Format(UserAccountEvent<TAccount> accountEvent, IDictionary<string, string> values)
         {
             if (accountEvent == null) throw new ArgumentNullException("accountEvent");
-            return CreateMessage(GetSubject(accountEvent, extra), GetBody(accountEvent, extra));
+            return CreateMessage(GetSubject(accountEvent, values), GetBody(accountEvent, values));
         }
 
-        protected virtual Tokenizer GetTokenizer(UserAccountEvent evt)
+        protected virtual Tokenizer GetTokenizer(UserAccountEvent<TAccount> evt)
         {
-            Type type = evt.GetType();
-            if (type == typeof(EmailChangeRequestedEvent)) return new EmailChangeRequestedTokenizer();
-            if (type == typeof(EmailChangedEvent)) return new EmailChangedTokenizer();
-            if (type == typeof(CertificateAddedEvent)) return new CertificateAddedTokenizer();
-            if (type == typeof(CertificateRemovedEvent)) return new CertificateRemovedTokenizer();
-            if (type == typeof(LinkedAccountAddedEvent)) return new LinkedAccountAddedTokenizer();
-            if (type == typeof(LinkedAccountRemovedEvent)) return new LinkedAccountRemovedTokenizer();
             return new Tokenizer();
         }
 
@@ -150,38 +84,49 @@ namespace BrockAllen.MembershipReboot
             return new Message { Subject = subject, Body = body };
         }
 
-        protected string FormatValue(UserAccountEvent evt, string value, dynamic extra)
+        protected string FormatValue(UserAccountEvent<TAccount> evt, string value, IDictionary<string, string> values)
         {
             if (value == null) return null;
 
             var tokenizer = GetTokenizer(evt);
-            return tokenizer.Tokenize(evt, this.ApplicationInformation, value, extra);
+            return tokenizer.Tokenize(evt, this.ApplicationInformation, value, values);
         }
 
-        protected virtual string GetSubject(UserAccountEvent evt, dynamic extra)
+        protected virtual string GetSubject(UserAccountEvent<TAccount> evt, IDictionary<string, string> values)
         {
-            return FormatValue(evt, LoadSubjectTemplate(evt), extra);
+            return FormatValue(evt, LoadSubjectTemplate(evt), values);
         }
-        protected virtual string GetBody(UserAccountEvent evt, dynamic extra)
+        protected virtual string GetBody(UserAccountEvent<TAccount> evt, IDictionary<string, string> values)
         {
-            return FormatValue(evt, LoadBodyTemplate(evt), extra);
+            return FormatValue(evt, LoadBodyTemplate(evt), values);
         }
 
-        protected virtual string LoadSubjectTemplate(UserAccountEvent evt)
+        protected virtual string LoadSubjectTemplate(UserAccountEvent<TAccount> evt)
         {
-            return LoadTemplate(evt.GetType().Name + "_Subject");
+            return LoadTemplate(CleanGenericName(evt.GetType()) + "_Subject");
         }
-        protected virtual string LoadBodyTemplate(UserAccountEvent evt)
+        protected virtual string LoadBodyTemplate(UserAccountEvent<TAccount> evt)
         {
-            return LoadTemplate(evt.GetType().Name + "_Body");
+            return LoadTemplate(CleanGenericName(evt.GetType()) + "_Body");
+        }
+
+        private string CleanGenericName(Type type)
+        {
+            var name = type.Name;
+            var idx = name.IndexOf('`');
+            if (idx > 0)
+            {
+                name = name.Substring(0, idx);
+            }
+            return name;
         }
 
         const string ResourcePathTemplate = "BrockAllen.MembershipReboot.Notification.Email.EmailTemplates.{0}.txt";
         string LoadTemplate(string name)
         {
             name = String.Format(ResourcePathTemplate, name);
-            
-            var asm = typeof(EmailMessageFormatter).Assembly;
+
+            var asm = typeof(EmailMessageFormatter<>).Assembly;
             using (var s = asm.GetManifestResourceStream(name))
             {
                 if (s == null) return null;
@@ -190,6 +135,18 @@ namespace BrockAllen.MembershipReboot
                     return sr.ReadToEnd();
                 }
             }
+        }
+    }
+
+    public class EmailMessageFormatter : EmailMessageFormatter<UserAccount>
+    {
+        public EmailMessageFormatter(ApplicationInformation appInfo)
+            : base(appInfo)
+        {
+        }
+        public EmailMessageFormatter(Lazy<ApplicationInformation> appInfo)
+            : base(appInfo)
+        {
         }
     }
 }

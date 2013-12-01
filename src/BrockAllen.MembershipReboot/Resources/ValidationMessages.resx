@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccountAlreadyVerified" xml:space="preserve">
+    <value>The email address for this account is already verified.</value>
+  </data>
   <data name="AccountCreateFailNoEmailFromIdp" xml:space="preserve">
     <value>Can't create an account because there was no email from the identity provider.</value>
   </data>
@@ -124,7 +127,7 @@
     <value>This account is not configured with a secret question or answer.</value>
   </data>
   <data name="AccountNotVerified" xml:space="preserve">
-    <value>Account not yet verified.</value>
+    <value>The email address for this account is not yet verified.</value>
   </data>
   <data name="AccountPasswordResetRequiresSecretQuestion" xml:space="preserve">
     <value>This account requires a secret question and answer to reset the password.</value>
@@ -135,11 +138,17 @@
   <data name="CertificateAlreadyInUse" xml:space="preserve">
     <value>That certificate is already in use by a different account.</value>
   </data>
+  <data name="CodeRequired" xml:space="preserve">
+    <value>Code required.</value>
+  </data>
   <data name="EmailAlreadyInUse" xml:space="preserve">
     <value>Email already in use.</value>
   </data>
   <data name="EmailRequired" xml:space="preserve">
     <value>Email is required.</value>
+  </data>
+  <data name="InvalidCertificate" xml:space="preserve">
+    <value>Invalid certificate.</value>
   </data>
   <data name="InvalidEmail" xml:space="preserve">
     <value>Invalid email.</value>
@@ -204,6 +213,9 @@
   <data name="PasswordRequired" xml:space="preserve">
     <value>Password is required.</value>
   </data>
+  <data name="PasswordResetErrorNoEmail" xml:space="preserve">
+    <value>Password reset is not possible since there is no verified email address for this account.</value>
+  </data>
   <data name="RegisterMobileForTwoFactor" xml:space="preserve">
     <value>Register a mobile phone number to enable mobile two factor authentication.</value>
   </data>
@@ -224,6 +236,9 @@
   </data>
   <data name="UsernameCannotContainAtSign" xml:space="preserve">
     <value>Username cannot contain the '@' character.</value>
+  </data>
+  <data name="UsernameOnlyContainLettersAndDigits" xml:space="preserve">
+    <value>Username can only contain letters and digits.</value>
   </data>
   <data name="UsernameRequired" xml:space="preserve">
     <value>Username is required.</value>

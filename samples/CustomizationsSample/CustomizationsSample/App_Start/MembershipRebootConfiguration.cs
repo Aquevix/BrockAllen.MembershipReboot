@@ -1,13 +1,14 @@
 ﻿using BrockAllen.MembershipReboot.WebHost;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Web;
 
 namespace BrockAllen.MembershipReboot.Mvc.App_Start
 {
-    public class PasswordValidator : IValidator
+    public class PasswordValidator : IValidator<CustomUserAccount>
     {
-        public ValidationResult Validate(UserAccountService service, UserAccount account, string value)
+        public ValidationResult Validate(UserAccountService<CustomUserAccount> service, CustomUserAccount account, string value)
         {
             if (value.Length < 4)
             {
@@ -20,13 +21,21 @@ namespace BrockAllen.MembershipReboot.Mvc.App_Start
 
     public class MembershipRebootConfig
     {
-        public static MembershipRebootConfiguration Create()
+        public static MembershipRebootConfiguration<CustomUserAccount> Create()
         {
             var settings = SecuritySettings.Instance;
             settings.MultiTenant = false;
             
-            var config = new MembershipRebootConfiguration(settings);
+            var config = new MembershipRebootConfiguration<CustomUserAccount>(settings);
             config.RegisterPasswordValidator(new PasswordValidator());
+            config.CustomUserPropertiesToClaimsMap = user =>
+                {
+                    return new System.Security.Claims.Claim[]
+                    {
+                        new System.Security.Claims.Claim(ClaimTypes.GivenName, user.FirstName),
+                        new System.Security.Claims.Claim(ClaimTypes.Surname, user.LastName),
+                    };
+                };
 
             var delivery = new SmtpMessageDelivery();
 
@@ -40,14 +49,16 @@ namespace BrockAllen.MembershipReboot.Mvc.App_Start
 
             if (settings.RequireAccountVerification)
             {
-                config.AddEventHandler(new EmailAccountCreatedEventHandler(formatter, delivery));
+                config.AddEventHandler(new EmailAccountCreatedEventHandler<CustomUserAccount>(formatter, delivery));
             }
-            config.AddEventHandler(new EmailAccountEventsHandler(formatter, delivery));
+            config.AddEventHandler(new EmailAccountEventsHandler<CustomUserAccount>(formatter, delivery));
             config.AddEventHandler(new AuthenticationAuditEventHandler());
             config.AddEventHandler(new NotifyAccountOwnerWhenTooManyFailedLoginAttempts());
 
             config.AddValidationHandler(new PasswordChanging());
             config.AddEventHandler(new PasswordChanged());
+
+            config.ConfigureCookieBasedTwoFactorAuthPolicy(new AspNetCookieBasedTwoFactorAuthPolicy<CustomUserAccount>());
 
             return config;
         }

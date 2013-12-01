@@ -1,61 +1,58 @@
-﻿/*
- * Copyright (c) Brock Allen.  All rights reserved.
- * see license.txt
- */
-
-using BrockAllen.MembershipReboot.Helpers;
+﻿using BrockAllen.MembershipReboot.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BrockAllen.MembershipReboot
 {
-    public static class CryptoHelper
+    public class DefaultCrypto : ICrypto
     {
-        internal const char PasswordHashingIterationCountSeparator = '.';
-        internal static Func<int> GetCurrentYear = () => DateTime.Now.Year;
-
-        internal static string Hash(string value)
+        public const char PasswordHashingIterationCountSeparator = '.';
+        
+        public string Hash(string value)
         {
             return Crypto.Hash(value);
         }
-        
-        internal static string Hash(string value, string key)
+
+        public string Hash(string value, string key)
         {
             if (String.IsNullOrWhiteSpace(value)) throw new ArgumentNullException("value");
             if (String.IsNullOrWhiteSpace(key)) throw new ArgumentNullException("key");
 
             var valueBytes = System.Text.Encoding.UTF8.GetBytes(value);
             var keyBytes = System.Text.Encoding.UTF8.GetBytes(key);
-            
+
             var alg = new System.Security.Cryptography.HMACSHA512(keyBytes);
             var hash = alg.ComputeHash(valueBytes);
-            
+
             var result = Crypto.BinaryToHex(hash);
             return result;
         }
 
-        internal static string GenerateNumericCode(int digits)
+        public string GenerateNumericCode(int digits)
         {
             // 18 is good size for a long
             if (digits > 18) digits = 18;
             if (digits <= 0) digits = 6;
-            
+
             var bytes = Crypto.GenerateSaltInternal(sizeof(long));
             var val = BitConverter.ToInt64(bytes, 0);
             var mod = (int)Math.Pow(10, digits);
             val %= mod;
             val = Math.Abs(val);
-            
+
             return val.ToString("D" + digits);
         }
-        
-        internal static string GenerateSalt()
+
+        public string GenerateSalt()
         {
             return Crypto.GenerateSalt();
         }
 
-        internal static string HashPassword(string password, int iterations)
+        public string HashPassword(string password, int iterations)
         {
             var count = iterations;
             if (count <= 0)
@@ -66,7 +63,7 @@ namespace BrockAllen.MembershipReboot
             return EncodeIterations(count) + PasswordHashingIterationCountSeparator + result;
         }
 
-        internal static bool VerifyHashedPassword(string hashedPassword, string password)
+        public bool VerifyHashedPassword(string hashedPassword, string password)
         {
             if (hashedPassword.Contains(PasswordHashingIterationCountSeparator))
             {
@@ -77,7 +74,7 @@ namespace BrockAllen.MembershipReboot
                 if (count <= 0) return false;
 
                 hashedPassword = parts[1];
-                
+
                 return Crypto.VerifyHashedPassword(hashedPassword, password, count);
             }
             else
@@ -86,12 +83,17 @@ namespace BrockAllen.MembershipReboot
             }
         }
 
-        internal static string EncodeIterations(int count)
+        public bool SlowEquals(string a, string b)
+        {
+            return SlowEqualsInternal(a, b);
+        }
+
+        public string EncodeIterations(int count)
         {
             return count.ToString("X");
         }
 
-        internal static int DecodeIterations(string prefix)
+        public int DecodeIterations(string prefix)
         {
             int val;
             if (Int32.TryParse(prefix, System.Globalization.NumberStyles.HexNumber, null, out val))
@@ -104,7 +106,7 @@ namespace BrockAllen.MembershipReboot
         // from OWASP : https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet
         const int StartYear = 2000;
         const int StartCount = 1000;
-        internal static int GetIterationsFromYear(int year)
+        public int GetIterationsFromYear(int year)
         {
             if (year > StartYear)
             {
@@ -118,9 +120,9 @@ namespace BrockAllen.MembershipReboot
             }
             return StartCount;
         }
-
+        
         [MethodImpl(MethodImplOptions.NoOptimization)]
-        internal static bool SlowEquals(string a, string b)
+        internal static bool SlowEqualsInternal(string a, string b)
         {
             if (Object.ReferenceEquals(a, b))
             {
@@ -138,6 +140,11 @@ namespace BrockAllen.MembershipReboot
                 same &= (a[i] == b[i]);
             }
             return same;
+        }
+        
+        public virtual int GetCurrentYear()
+        {
+            return DateTime.Now.Year;
         }
     }
 }

@@ -35,10 +35,10 @@ namespace BrockAllen.MembershipReboot.Ef
             return items;
         }
 
-        T IRepository<T>.Get(params object[] keys)
+        T IRepository<T>.Get(Guid key)
         {
             CheckDisposed();
-            return items.Find(keys);
+            return items.Find(key);
         }
 
         T IRepository<T>.Create()

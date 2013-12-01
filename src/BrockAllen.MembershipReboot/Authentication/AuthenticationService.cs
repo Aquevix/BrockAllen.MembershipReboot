@@ -12,17 +12,18 @@ using System.Security.Claims;
 
 namespace BrockAllen.MembershipReboot
 {
-    public abstract class AuthenticationService
+    public abstract class AuthenticationService<TAccount>
+        where TAccount : UserAccount
     {
-        public UserAccountService UserAccountService { get; set; }
+        public UserAccountService<TAccount> UserAccountService { get; set; }
         public ClaimsAuthenticationManager ClaimsAuthenticationManager { get; set; }
 
-        public AuthenticationService(UserAccountService userService)
+        public AuthenticationService(UserAccountService<TAccount> userService)
             : this(userService, null)
         {
         }
-        
-        public AuthenticationService(UserAccountService userService, ClaimsAuthenticationManager claimsAuthenticationManager)
+
+        public AuthenticationService(UserAccountService<TAccount> userService, ClaimsAuthenticationManager claimsAuthenticationManager)
         {
             this.UserAccountService = userService;
             this.ClaimsAuthenticationManager = claimsAuthenticationManager;
@@ -39,27 +40,22 @@ namespace BrockAllen.MembershipReboot
             SignIn(account, AuthenticationMethods.Password);
         }
 
-        public virtual void SignIn(UserAccount account)
+        public virtual void SignIn(TAccount account)
         {
             SignIn(account, AuthenticationMethods.Password);
         }
 
-        public virtual void SignIn(UserAccount account, string method)
+        public virtual void SignIn(TAccount account, string method)
         {
             if (account == null) throw new ArgumentNullException("account");
             if (String.IsNullOrWhiteSpace(method)) throw new ArgumentNullException("method");
-
-            if (!account.IsAccountVerified)
-            {
-                throw new ValidationException(Resources.ValidationMessages.AccountNotVerified);
-            }
 
             if (!account.IsLoginAllowed)
             {
                 throw new ValidationException(Resources.ValidationMessages.LoginNotAllowed);
             }
 
-            if (account.RequiresTwoFactorAuthToSignIn || 
+            if (account.RequiresTwoFactorAuthToSignIn() || 
                 account.RequiresPasswordReset || 
                 this.UserAccountService.IsPasswordExpired(account))
             {
@@ -88,6 +84,12 @@ namespace BrockAllen.MembershipReboot
                  select new Claim(uc.Type, uc.Value)).ToList();
             claims.AddRange(otherClaims);
 
+            // get custom claims from properties
+            if (this.UserAccountService.Configuration.CustomUserPropertiesToClaimsMap != null)
+            {
+                claims.AddRange(this.UserAccountService.Configuration.CustomUserPropertiesToClaimsMap(account));
+            }
+
             // create principal/identity
             var id = new ClaimsIdentity(claims, method);
             var cp = new ClaimsPrincipal(id);
@@ -102,7 +104,7 @@ namespace BrockAllen.MembershipReboot
             IssueToken(cp);
         }
 
-        private static List<Claim> GetBasicClaims(UserAccount account, string method)
+        private static List<Claim> GetBasicClaims(TAccount account, string method)
         {
             if (account == null) throw new ArgumentNullException("account");
 
@@ -116,7 +118,7 @@ namespace BrockAllen.MembershipReboot
             return claims;
         }
 
-        private void IssuePartialSignInToken(UserAccount account, string method)
+        private void IssuePartialSignInToken(TAccount account, string method)
         {
             if (account == null) throw new ArgumentNullException("account");
 
@@ -154,7 +156,7 @@ namespace BrockAllen.MembershipReboot
             if (String.IsNullOrWhiteSpace(providerAccountID)) throw new ArgumentException("providerAccountID");
             if (claims == null) throw new ArgumentNullException("claims");
 
-            UserAccount account = null;
+            TAccount account = null;
             var user = ClaimsPrincipal.Current;
             if (user.Identity.IsAuthenticated)
             {
@@ -193,7 +195,7 @@ namespace BrockAllen.MembershipReboot
                     // this is slightly dangerous if we don't do email account verification, so if email account
                     // verification is disabled then we need to be very confident that the external provider has
                     // provided us with a verified email
-                    var pwd = CryptoHelper.GenerateSalt();
+                    var pwd = this.UserAccountService.Configuration.Crypto.GenerateSalt();
                     account = this.UserAccountService.CreateAccount(tenant, name, pwd, email);
                 }
             }
@@ -201,8 +203,8 @@ namespace BrockAllen.MembershipReboot
             if (account == null) throw new Exception("Failed to locate account");
 
             // add/update the provider with this account
-            account.AddOrUpdateLinkedAccount(providerName, providerAccountID, claims);
-            this.UserAccountService.Update(account);
+            this.UserAccountService.AddOrUpdateLinkedAccount(account, providerName, providerAccountID, claims);
+            //this.UserAccountService.Update(account);
 
             // signin from the account
             // if we want to include the provider's claims, then perhaps this
@@ -216,6 +218,25 @@ namespace BrockAllen.MembershipReboot
 
             // clear cookie
             RevokeToken();
+        }
+    }
+    
+    public abstract class AuthenticationService : AuthenticationService<UserAccount>
+    {
+        public new UserAccountService UserAccountService
+        {
+            get { return (UserAccountService)base.UserAccountService; }
+            set { base.UserAccountService = value; }
+        }
+
+        public AuthenticationService(UserAccountService userService)
+            : this(userService, null)
+        {
+        }
+
+        public AuthenticationService(UserAccountService userService, ClaimsAuthenticationManager claimsAuthenticationManager)
+            : base(userService, claimsAuthenticationManager)
+        {
         }
     }
 }

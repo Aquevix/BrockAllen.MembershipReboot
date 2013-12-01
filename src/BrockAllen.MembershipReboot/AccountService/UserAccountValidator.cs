@@ -9,19 +9,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BrockAllen.MembershipReboot
 {
-    class UserAccountValidator :
-        IEventHandler<CertificateAddedEvent>,
-        IEventHandler<MobilePhoneChangeRequestedEvent>,
-        IEventHandler<MobilePhoneChangedEvent>
+    class UserAccountValidator<TAccount> :
+        IEventHandler<CertificateAddedEvent<TAccount>>,
+        IEventHandler<MobilePhoneChangeRequestedEvent<TAccount>>,
+        IEventHandler<MobilePhoneChangedEvent<TAccount>>
+        where TAccount : UserAccount
     {
-        UserAccountService userAccountService;
-        public UserAccountValidator(UserAccountService userAccountService)
+        UserAccountService<TAccount> userAccountService;
+        public UserAccountValidator(UserAccountService<TAccount> userAccountService)
         {
             if (userAccountService == null) throw new ArgumentNullException("userAccountService");
             this.userAccountService = userAccountService;
         }
-        
-        public void Handle(CertificateAddedEvent evt)
+
+        public void Handle(CertificateAddedEvent<TAccount> evt)
         {
             if (evt == null) throw new ArgumentNullException("event");
             if (evt.Account == null) throw new ArgumentNullException("account");
@@ -36,7 +37,7 @@ namespace BrockAllen.MembershipReboot
             }
         }
 
-        public void Handle(MobilePhoneChangeRequestedEvent evt)
+        public void Handle(MobilePhoneChangeRequestedEvent<TAccount> evt)
         {
             if (evt == null) throw new ArgumentNullException("event");
             if (evt.Account == null) throw new ArgumentNullException("account");
@@ -45,7 +46,7 @@ namespace BrockAllen.MembershipReboot
             ValidateMobileNumber(evt.Account, evt.NewMobilePhoneNumber);
         }
 
-        public void Handle(MobilePhoneChangedEvent evt)
+        public void Handle(MobilePhoneChangedEvent<TAccount> evt)
         {
             if (evt == null) throw new ArgumentNullException("event");
             if (evt.Account == null) throw new ArgumentNullException("account");

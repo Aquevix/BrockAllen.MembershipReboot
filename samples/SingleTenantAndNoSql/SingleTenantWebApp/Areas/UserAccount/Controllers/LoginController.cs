@@ -34,11 +34,11 @@ namespace BrockAllen.MembershipReboot.Mvc.Areas.UserAccount.Controllers
                 {
                     authSvc.SignIn(account);
 
-                    if (account.RequiresTwoFactorAuthCodeToSignIn)
+                    if (account.RequiresTwoFactorAuthCodeToSignIn())
                     {
                         return RedirectToAction("TwoFactorAuthCodeLogin");
                     }
-                    if (account.RequiresTwoFactorCertificateToSignIn)
+                    if (account.RequiresTwoFactorCertificateToSignIn())
                     {
                         return RedirectToAction("CertificateLogin");
                     }
