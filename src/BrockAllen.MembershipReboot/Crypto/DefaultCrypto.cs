@@ -1,10 +1,12 @@
-﻿using BrockAllen.MembershipReboot.Helpers;
+﻿/*
+ * Copyright (c) Brock Allen.  All rights reserved.
+ * see license.txt
+ */
+
+using BrockAllen.MembershipReboot.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BrockAllen.MembershipReboot
 {
@@ -15,6 +17,12 @@ namespace BrockAllen.MembershipReboot
         public string Hash(string value)
         {
             return Crypto.Hash(value);
+        }
+        
+        public bool VerifyHash(string value, string hash)
+        {
+            var hashedValue = Hash(value);
+            return SlowEquals(hashedValue, hash);
         }
 
         public string Hash(string value, string key)
@@ -30,6 +38,12 @@ namespace BrockAllen.MembershipReboot
 
             var result = Crypto.BinaryToHex(hash);
             return result;
+        }
+        
+        public bool VerifyHash(string value, string key, string hash)
+        {
+            var hashedValue = Hash(value, key);
+            return SlowEquals(hashedValue, hash);
         }
 
         public string GenerateNumericCode(int digits)
@@ -141,7 +155,7 @@ namespace BrockAllen.MembershipReboot
             }
             return same;
         }
-        
+
         public virtual int GetCurrentYear()
         {
             return DateTime.Now.Year;

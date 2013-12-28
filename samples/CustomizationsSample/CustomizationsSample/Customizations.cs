@@ -4,6 +4,10 @@ using System.Linq;
 using System.Data.Entity;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.ComponentModel.DataAnnotations.Schema;
+using BrockAllen.MembershipReboot.Relational;
 
 namespace BrockAllen.MembershipReboot.Mvc
 {
@@ -29,20 +33,30 @@ namespace BrockAllen.MembershipReboot.Mvc
         public int ID { get; set; }
         public Guid UserID { get; set; }
         public DateTime DateChanged { get; set; }
+        [Required]
         public string PasswordHash { get; set; }
     }
 
-    public class CustomUserAccount : UserAccount
+    public class CustomUserAccount : RelationalUserAccountInt
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        
+        [NotMapped]
+        public string OtherFirstName
+        {
+            get
+            {
+                return this.GetClaimValue(ClaimTypes.GivenName);
+            }
+        }
     }
 
     public class CustomDatabase : DbContext
     {
         static CustomDatabase()
         {
-            Database.SetInitializer<CustomDatabase>(new CreateDatabaseIfNotExists<CustomDatabase>());
+            Database.SetInitializer<CustomDatabase>(new DropCreateDatabaseIfModelChanges<CustomDatabase>());
         }
 
         public CustomDatabase()
@@ -59,9 +73,15 @@ namespace BrockAllen.MembershipReboot.Mvc
         public DbSet<CustomUserAccount> UserAccountsTableWithSomeOtherName { get; set; }
         public DbSet<AuthenticationAudit> Audits { get; set; }
         public DbSet<PasswordHistory> PasswordHistory { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.ConfigureMembershipRebootUserAccountsInt<CustomUserAccount>();
+            //modelBuilder.Entity<CustomUserAccount>().HasKey(x => x.NonGuidPrimaryKey);
+        }
     }
 
-    public class CustomRepository : DbContextUserAccountRepository<CustomDatabase, CustomUserAccount>, IUserAccountRepository<CustomUserAccount>
+    public class CustomRepository : DbContextUserAccountRepositoryInt<CustomDatabase, CustomUserAccount>, IUserAccountRepository<CustomUserAccount>
     {
         // you can do either style ctor (or none) -- depends how much control 
         // you want over instantiating the CustomDatabase instance
@@ -195,20 +215,19 @@ namespace BrockAllen.MembershipReboot.Mvc
         {
         }
 
-        protected override string GetBody(UserAccountEvent<CustomUserAccount> evt, dynamic extra)
+        protected override string GetBody(UserAccountEvent<CustomUserAccount> evt, IDictionary<string, string> values)
         {
-            if (evt is AccountVerifiedEvent<CustomUserAccount>)
+            if (evt is EmailVerifiedEvent<CustomUserAccount>)
             {
                 return "your account was verified with " + this.ApplicationInformation.ApplicationName + ". good for you.";
             }
 
             if (evt is AccountClosedEvent<CustomUserAccount>)
             {
-                return FormatValue(evt, "your account was closed with {applicationName}. good riddance.", extra);
+                return FormatValue(evt, "your account was closed with {applicationName}. good riddance.", values);
             }
 
-            Func<UserAccountEvent<CustomUserAccount>, dynamic, string> f = base.GetBody;
-            return f(evt, extra);
+            return base.GetBody(evt, values);
         }
     }
 }

@@ -3,6 +3,7 @@
  * see license.txt
  */
 
+using BrockAllen.MembershipReboot.Relational;
 using System.Data.Entity;
 
 namespace BrockAllen.MembershipReboot.Ef
@@ -19,7 +20,13 @@ namespace BrockAllen.MembershipReboot.Ef
         {
         }
 
-        public DbSet<UserAccount> Users { get; set; }
+        public DbSet<RelationalUserAccount> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.ConfigureMembershipRebootUserAccounts<RelationalUserAccount>();
+            modelBuilder.ConfigureMembershipRebootGroups<Group>();
+        }
     }
 }

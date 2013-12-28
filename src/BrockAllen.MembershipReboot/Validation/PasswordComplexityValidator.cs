@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*
+ * Copyright (c) Brock Allen.  All rights reserved.
+ * see license.txt
+ */
+
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BrockAllen.MembershipReboot
 {
@@ -20,9 +22,12 @@ namespace BrockAllen.MembershipReboot
 
         public PasswordComplexityValidator(int minimumLength, int minimumNumberOfComplexityRules)
         {
+            if (minimumLength <= 0) minimumLength = 1;
             this.MinimumLength = minimumLength;
+            
+            if (minimumNumberOfComplexityRules < 0) minimumNumberOfComplexityRules = 0;
+            if (minimumNumberOfComplexityRules > 4) MinimumNumberOfComplexityRules = 4;
             this.MinimumNumberOfComplexityRules = minimumNumberOfComplexityRules;
-            if (MinimumNumberOfComplexityRules > 4) MinimumNumberOfComplexityRules = 4;
         }
 
         public ValidationResult Validate(UserAccountService<T> service, T account, string value)

@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -40,10 +40,10 @@
   <ItemGroup>
     <Compile Include="AspNetApplicationInformation.cs" />
     <Compile Include="AspNetCookieBasedTwoFactorAuthPolicy.cs" />
-    <Compile Include="ConfigurationExtensions.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SamAuthenticationService.cs" />
+    <Compile Include="MembershipRebootConfigurationExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BrockAllen.MembershipReboot\BrockAllen.MembershipReboot.csproj">

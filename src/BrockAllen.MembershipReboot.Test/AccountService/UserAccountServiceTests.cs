@@ -3,14 +3,12 @@
  * see license.txt
  */
 
-using System;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+using System;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography.X509Certificates;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BrockAllen.MembershipReboot.Test.AccountService
 {
@@ -199,7 +197,7 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
         public void CreateAccount_CreatesAccountInRepository()
         {
             var result = subject.CreateAccount("test", "test", "test@test.com");
-            Assert.AreSame(repository.Get(result.ID), result);
+            Assert.AreSame(repository.GetByID(result.ID), result);
         }
 
         [TestMethod]
@@ -338,7 +336,7 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
             configuration.MultiTenant = false;
             configuration.DefaultTenant = "foo";
             var id = subject.CreateAccount("test", "pass", "test@test.com").ID;
-            var acct = repository.Get(id);
+            var acct = repository.GetByID(id);
             Assert.AreEqual("foo", acct.Tenant);
         }
 
@@ -355,13 +353,41 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
                 Assert.AreEqual(Resources.ValidationMessages.PasswordRequired, ex.Message);
             }
         }
+
+        [TestMethod]
+        public void CreateAccount_WhitespacePassword_FailsValidation()
+        {
+            try
+            {
+                subject.CreateAccount("test", "   ", "test@test.com");
+                Assert.Fail();
+            }
+            catch (ValidationException ex)
+            {
+                Assert.AreEqual(Resources.ValidationMessages.PasswordRequired, ex.Message);
+            }
+        }
+        
+        [TestMethod]
+        public void CreateAccount_WhitespaceUsername_FailsValidation()
+        {
+            try
+            {
+                subject.CreateAccount("    ", "pass", "test@test.com");
+                Assert.Fail();
+            }
+            catch (ValidationException ex)
+            {
+                Assert.AreEqual(Resources.ValidationMessages.UsernameRequired, ex.Message);
+            }
+        }
         
         [TestMethod]
         public void CreateAccount_SettingsRequireEmailIsUsername_UsernameIsEmail()
         {
             configuration.EmailIsUsername = true;
             var id = subject.CreateAccount("test", "pass", "test@test.com").ID;
-            var acct = repository.Get(id);
+            var acct = repository.GetByID(id);
             Assert.AreEqual("test@test.com", acct.Username);
         }
 
@@ -445,9 +471,9 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
         public void CancelVerification_DeletesAccount()
         {
             var acct = subject.CreateAccount("test", "pass", "test@test.com");
-            Assert.IsNotNull(repository.Get(acct.ID));
+            Assert.IsNotNull(repository.GetByID(acct.ID));
             subject.CancelVerification(LastVerificationKey);
-            Assert.IsNull(repository.Get(acct.ID));
+            Assert.IsNull(repository.GetByID(acct.ID));
         }
         
         [TestMethod]
@@ -490,12 +516,28 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
         }
 
         [TestMethod]
+        public void CancelVerification_PasswordResets_ClearsVerification()
+        {
+            var acct = subject.CreateAccount("test", "pass", "test@test.com");
+            subject.VerifyEmailFromKey(LastVerificationKey, "pass");
+            subject.ResetPassword("test@test.com");
+            acct = subject.GetByID(acct.ID);
+            Assert.IsNotNull(acct.VerificationPurpose);
+            var key = LastVerificationKey;
+
+            subject.CancelVerification(key);
+            
+            acct = subject.GetByID(acct.ID);
+            Assert.IsNull(acct.VerificationPurpose);
+        }
+
+        [TestMethod]
         public void DeleteAccount_DeletesAccount()
         {
             var acct = subject.CreateAccount("test", "pass", "test@test.com");
-            Assert.IsNotNull(repository.Get(acct.ID));
+            Assert.IsNotNull(repository.GetByID(acct.ID));
             subject.DeleteAccount(acct.ID);
-            Assert.IsNull(repository.Get(acct.ID));
+            Assert.IsNull(repository.GetByID(acct.ID));
         }
         
         [TestMethod]
@@ -823,7 +865,7 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
 
             subject.ConfigureTwoFactorAuthentication(id, TwoFactorAuthMode.Mobile);
 
-            var acct = repository.Get(id);
+            var acct = repository.GetByID(id);
             Assert.AreEqual(TwoFactorAuthMode.Mobile, acct.AccountTwoFactorAuthMode);
         }
 
@@ -854,7 +896,7 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
 
             subject.ConfigureTwoFactorAuthentication(id, TwoFactorAuthMode.Certificate);
 
-            acct = repository.Get(id);
+            acct = repository.GetByID(id);
             Assert.AreEqual(TwoFactorAuthMode.Certificate, acct.AccountTwoFactorAuthMode);
         }
 
@@ -1107,7 +1149,7 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
             var id = subject.CreateAccount("test", "pass", "test@test.com").ID;
             subject.ChangeUsername(id, "test2");
 
-            Assert.AreEqual("test2", repository.Get(id).Username);
+            Assert.AreEqual("test2", repository.GetByID(id).Username);
         }
 
         [TestMethod]
@@ -1179,7 +1221,7 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
 
             subject.ChangeEmailRequest(id, "test2@test.com");
             subject.VerifyEmailFromKey(LastVerificationKey, "pass");
-            var acct = repository.Get(id);
+            var acct = repository.GetByID(id);
             Assert.AreEqual("test2@test.com", acct.Email);
         }
         
@@ -1255,7 +1297,7 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
             subject.ChangeEmailRequest(id, "test2@test.com");
             subject.VerifyEmailFromKey(LastVerificationKey, "pass");
 
-            Assert.AreEqual("test2@test.com", repository.Get(id).Username);
+            Assert.AreEqual("test2@test.com", repository.GetByID(id).Username);
         }
 
         [TestMethod]
@@ -1326,7 +1368,7 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
 
             subject.RemoveMobilePhone(id);
 
-            Assert.IsNull(repository.Get(id).MobilePhoneNumber);
+            Assert.IsNull(repository.GetByID(id).MobilePhoneNumber);
         }
 
         [TestMethod]
@@ -1357,7 +1399,7 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
             var acct = subject.GetByID(id);
             subject.ChangeMobilePhoneFromCode(id, LastMobileCode);
 
-            Assert.AreEqual("123", repository.Get(id).MobilePhoneNumber);
+            Assert.AreEqual("123", repository.GetByID(id).MobilePhoneNumber);
         }
 
         [TestMethod]
@@ -1464,6 +1506,36 @@ namespace BrockAllen.MembershipReboot.Test.AccountService
             {
                 Assert.AreEqual(Resources.ValidationMessages.CodeRequired, ex.Message);
             }
+        }
+
+        [TestMethod]
+        public void RemoveLinkedAccount_NoPassword_CantRemoveLastLinkedAccount()
+        {
+            var acct = subject.CreateAccount("test", null, "test@test.com");
+            subject.AddOrUpdateLinkedAccount(acct, "google", "123", null);
+
+            try
+            {
+                subject.RemoveLinkedAccount(acct.ID, "google", "123");
+                Assert.Fail();
+            }
+            catch (ValidationException ex)
+            {
+                Assert.AreEqual(Resources.ValidationMessages.CantRemoveLastLinkedAccountIfNoPassword, ex.Message);
+            }
+        }
+        [TestMethod]
+        public void RemoveLinkedAccount_NoPassword_CanRemoveSecondToLastLinkedAccount()
+        {
+            var acct = subject.CreateAccount("test", null, "test@test.com");
+            subject.AddOrUpdateLinkedAccount(acct, "google", "123", null);
+            subject.AddOrUpdateLinkedAccount(acct, "facebook", "123", null);
+            
+            Assert.IsNotNull(subject.GetByLinkedAccount("google", "123"));
+
+            subject.RemoveLinkedAccount(acct.ID, "google", "123");
+
+            Assert.IsNull(subject.GetByLinkedAccount("google", "123"));
         }
 
 

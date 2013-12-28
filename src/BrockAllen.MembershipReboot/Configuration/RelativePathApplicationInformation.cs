@@ -1,19 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+ * Copyright (c) Brock Allen.  All rights reserved.
+ * see license.txt
+ */
+
+using System;
 
 namespace BrockAllen.MembershipReboot
 {
-    public abstract class RelativePathApplicationInformation : ApplicationInformation
+    public class RelativePathApplicationInformation : ApplicationInformation
     {
+        public RelativePathApplicationInformation()
+        {
+        }
+        public RelativePathApplicationInformation(string baseUrl)
+        {
+            this.baseUrl = baseUrl;
+        }
+
         public string RelativeLoginUrl { get; set; }
         public string RelativeConfirmPasswordResetUrl { get; set; }
         public string RelativeConfirmChangeEmailUrl { get; set; }
         public string RelativeCancelVerificationUrl { get; set; }
 
-        protected abstract string GetApplicationBaseUrl();
+        protected virtual string GetApplicationBaseUrl()
+        {
+            throw new NotImplementedException("Either set baseUrl as ctor param or derive and override GetApplicationBaseUrl");
+        }
+
+        public bool HasBaseUrl
+        {
+            get { return baseUrl != null; }
+        }
+
+        protected void SetBaseUrl(string url)
+        {
+            this.baseUrl = url;
+        }
 
         string baseUrl;
         object urlLock = new object();
@@ -21,11 +43,11 @@ namespace BrockAllen.MembershipReboot
         {
             get
             {
-                if (baseUrl == null)
+                if (!HasBaseUrl)
                 {
                     lock (urlLock)
                     {
-                        if (baseUrl == null)
+                        if (!HasBaseUrl)
                         {
                             // build URL
                             var tmp = GetApplicationBaseUrl();

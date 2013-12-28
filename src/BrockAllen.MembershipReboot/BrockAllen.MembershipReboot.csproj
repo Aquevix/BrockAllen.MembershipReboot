@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\build\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -43,17 +43,29 @@
     <Compile Include="AccountService\AuthenticationPurpose.cs" />
     <Compile Include="AccountService\DebuggerEventHandler.cs" />
     <Compile Include="AccountService\PasswordResetQuestionAnswer.cs" />
+    <Compile Include="AccountService\UserAccountCommands.cs" />
     <Compile Include="AccountService\UserAccountValidator.cs" />
     <Compile Include="Account\LinkedAccountClaim.cs" />
+    <Compile Include="Account\Relational\RelationalLinkedAccountClaim.cs" />
+    <Compile Include="Account\Relational\RelationalLinkedAccount.cs" />
+    <Compile Include="Account\Relational\RelationalUserCertificate.cs" />
+    <Compile Include="Account\Relational\RelationalTwoFactorAuthToken.cs" />
+    <Compile Include="Account\Relational\RelationalPasswordResetSecret.cs" />
+    <Compile Include="Account\Relational\RelationalUserClaim.cs" />
+    <Compile Include="Account\Relational\RelationalUserAccount.cs" />
+    <Compile Include="Account\Hierarchical\HierarchicalUserAccount.cs" />
     <Compile Include="Account\TwoFactorAuthToken.cs" />
     <Compile Include="Account\PasswordResetSecret.cs" />
     <Compile Include="Authentication\AuthenticationService.cs" />
+    <Compile Include="Bus\CommandBus.cs" />
+    <Compile Include="Bus\Commands.cs" />
+    <Compile Include="Bus\GenericMethodActionBuilder.cs" />
     <Compile Include="Configuration\RelativePathApplicationInformation.cs" />
     <Compile Include="Crypto\DefaultCrypto.cs" />
     <Compile Include="Crypto\ICrypto.cs" />
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
-    <Compile Include="Extensions\LinkedAccountExtensions.cs" />
-    <Compile Include="Extensions\IUserAccountExtensions.cs" />
+    <Compile Include="Extensions\UserAccountExtensions.cs" />
+    <Compile Include="Extensions\UserAccountServiceExtensions.cs" />
     <Compile Include="Extensions\X509Certificate2Extensions.cs" />
     <Compile Include="Account\TwoFactorAuthMode.cs" />
     <Compile Include="Groups\Group.cs" />
@@ -61,14 +73,18 @@
     <Compile Include="Groups\GroupChild.cs" />
     <Compile Include="Groups\GroupService.cs" />
     <Compile Include="Repository\IGroupRepository.cs" />
-    <Compile Include="Repository\IRepository.cs" />
+    <Compile Include="Repository\QueryableUserAccountRepository.cs" />
+    <Compile Include="Resources\ValidationMessages.ru-ru.Designer.cs">
+      <DependentUpon>ValidationMessages.ru-ru.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Resources\ValidationMessages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ValidationMessages.resx</DependentUpon>
     </Compile>
     <Compile Include="TwoFactorAuthPolicy\CookieBasedTwoFactorAuthPolicy.cs" />
-    <Compile Include="TwoFactorAuthPolicy\ITwoFactorAuthenticationPolicy.cs" />
     <Compile Include="Configuration\MembershipRebootConfiguration.cs" />
     <Compile Include="Extensions\ClaimsExtensions.cs" />
     <Compile Include="Extensions\ClaimsPrincipalExtensions.cs" />
@@ -98,6 +114,8 @@
     <Compile Include="AccountService\UserAccountService.cs" />
     <Compile Include="Notification\Email\EmailNotificationEventHandlers.cs" />
     <Compile Include="Tracing\Tracing.cs" />
+    <Compile Include="TwoFactorAuthPolicy\ITwoFactorAuthenticationPolicy.cs" />
+    <Compile Include="TwoFactorAuthPolicy\TwoFactorAuthPolicyCommandHandler.cs" />
     <Compile Include="Validation\AggregateValidator.cs" />
     <Compile Include="Validation\DelegateValidator.cs" />
     <Compile Include="Validation\IValidator.cs" />
@@ -109,6 +127,8 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="license.txt" />
+    <EmbeddedResource Include="Notification\Email\EmailTemplates\AccountReopenedEvent_Subject.txt" />
+    <EmbeddedResource Include="Notification\Email\EmailTemplates\AccountReopenedEvent_Body.txt" />
     <EmbeddedResource Include="Notification\Email\EmailTemplates\LinkedAccountRemovedEvent_Subject.txt" />
     <EmbeddedResource Include="Notification\Email\EmailTemplates\LinkedAccountRemovedEvent_Body.txt" />
     <EmbeddedResource Include="Notification\Email\EmailTemplates\LinkedAccountAddedEvent_Subject.txt" />
@@ -140,6 +160,11 @@
     <EmbeddedResource Include="Notification\Email\EmailTemplates\EmailVerifiedEvent_Body.txt" />
     <EmbeddedResource Include="Notification\Email\EmailTemplates\AccountCreatedEvent_Subject.txt" />
     <EmbeddedResource Include="Notification\Email\EmailTemplates\AccountCreatedEvent_Body.txt" />
+    <EmbeddedResource Include="Resources\ValidationMessages.ru-ru.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ValidationMessages.ru-ru.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\ValidationMessages.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>

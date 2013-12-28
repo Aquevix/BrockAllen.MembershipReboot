@@ -4,6 +4,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Nancy;
 using Nancy.Owin;
+using Nancy.Security;
 using Owin;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,28 @@ namespace OwinHostSample
 {
     public static class NancyOwinExtensions
     {
-        public static OwinContext ToOwinContext(this NancyContext ctx)
+        public static IDictionary<string, object> GetOwinEnvironment(this NancyContext ctx)
         {
-            return new OwinContext((IDictionary<string, object>)ctx.Items[NancyOwinHost.RequestEnvironmentKey]);
+            return (IDictionary<string, object>)(ctx.Items[NancyOwinHost.RequestEnvironmentKey]);
+        }
+        public static UserAccountService<TAccount> GetUserAccountService<TAccount>(this NancyContext ctx)
+            where TAccount : UserAccount
+        {
+            return ctx.GetOwinEnvironment().GetUserAccountService<TAccount>();
+        }
+        public static AuthenticationService<TAccount> GetAuthenticationService<TAccount>(this NancyContext ctx)
+            where TAccount : UserAccount
+        {
+            return ctx.GetOwinEnvironment().GetAuthenticationService<TAccount>();
+        }
+
+        public static UserAccountService<UserAccount> GetUserAccountService(this NancyContext ctx)
+        {
+            return ctx.GetUserAccountService<UserAccount>();
+        }
+        public static AuthenticationService<UserAccount> GetAuthenticationService(this NancyContext ctx)
+        {
+            return ctx.GetAuthenticationService<UserAccount>();
         }
 
         public static IAuthenticationManager GetOwinAuthentication(this NancyContext context)
@@ -34,27 +54,9 @@ namespace OwinHostSample
             return auth.User;
         }
 
-        public static void ConfigureMembershipReboot(this IAppBuilder app)
+        public static Guid GetUserID(this IUserIdentity user)
         {
-            app.UseMembershipReboot(Microsoft.Owin.Security.Cookies.CookieSecureOption.SameAsRequest);
-            app.Use<MembershipRebootConfigurationMiddleware>();
-        }
-
-        public static void SetUserAccountService(this IOwinContext ctx, UserAccountService svc)
-        {
-            ctx.Set("mr.UserAccountService", svc);
-        }
-        public static UserAccountService GetUserAccountService(this IOwinContext ctx)
-        {
-            return ctx.Get<UserAccountService>("mr.UserAccountService");
-        }
-        public static void SetAuthenticationService(this IOwinContext ctx, AuthenticationService svc)
-        {
-            ctx.Set("mr.UserAuthenticationService", svc);
-        }
-        public static AuthenticationService GetAuthenticationService(this IOwinContext ctx)
-        {
-            return ctx.Get<AuthenticationService>("mr.UserAuthenticationService");
+            return ((ClaimsUserIdentity)user).Principal.GetUserID();
         }
     }
 }

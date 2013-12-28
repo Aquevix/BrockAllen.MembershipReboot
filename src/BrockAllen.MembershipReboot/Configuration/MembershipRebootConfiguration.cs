@@ -82,10 +82,15 @@ namespace BrockAllen.MembershipReboot
         {
             validationBus.AddRange(handlers);
         }
+
+        CommandBus commandBus = new CommandBus();
+        public ICommandBus CommandBus { get { return commandBus; } }
+        public void AddCommandHandler(ICommandHandler handler)
+        {
+            commandBus.Add(handler);
+        }
         
-        public ITwoFactorAuthenticationPolicy TwoFactorAuthenticationPolicy { get; set; }
         public ICrypto Crypto { get; set; }
-        public Func<TAccount, IEnumerable<Claim>> CustomUserPropertiesToClaimsMap { get; set; }
     }
     
     public class MembershipRebootConfiguration : MembershipRebootConfiguration<UserAccount>

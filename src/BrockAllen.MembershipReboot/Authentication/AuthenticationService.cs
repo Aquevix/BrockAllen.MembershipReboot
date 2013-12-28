@@ -29,30 +29,36 @@ namespace BrockAllen.MembershipReboot
             this.ClaimsAuthenticationManager = claimsAuthenticationManager;
         }
 
+        protected abstract ClaimsPrincipal GetCurentPrincipal();
         protected abstract void IssueToken(ClaimsPrincipal principal, TimeSpan? tokenLifetime = null, bool? persistentCookie = null);
         protected abstract void RevokeToken();
 
-        public virtual void SignIn(Guid userID)
+        public virtual void SignIn(Guid userID, bool persistent = false)
         {
             var account = this.UserAccountService.GetByID(userID);
             if (account == null) throw new ArgumentException("Invalid userID");
 
-            SignIn(account, AuthenticationMethods.Password);
+            SignIn(account, AuthenticationMethods.Password, persistent);
         }
 
-        public virtual void SignIn(TAccount account)
+        public virtual void SignIn(TAccount account, bool persistent = false)
         {
-            SignIn(account, AuthenticationMethods.Password);
+            SignIn(account, AuthenticationMethods.Password, persistent);
         }
 
-        public virtual void SignIn(TAccount account, string method)
+        public virtual void SignIn(TAccount account, string method, bool persistent = false)
         {
             if (account == null) throw new ArgumentNullException("account");
             if (String.IsNullOrWhiteSpace(method)) throw new ArgumentNullException("method");
 
-            if (!account.IsLoginAllowed)
+            if (!account.IsLoginAllowed || account.IsAccountClosed)
             {
-                throw new ValidationException(Resources.ValidationMessages.LoginNotAllowed);
+                throw new ValidationException(UserAccountService.GetValidationMessage("LoginNotAllowed"));
+            }
+
+            if (!account.IsAccountVerified && UserAccountService.Configuration.RequireAccountVerification)
+            {
+                throw new ValidationException(UserAccountService.GetValidationMessage("AccountNotVerified"));
             }
 
             if (account.RequiresTwoFactorAuthToSignIn() || 
@@ -85,9 +91,11 @@ namespace BrockAllen.MembershipReboot
             claims.AddRange(otherClaims);
 
             // get custom claims from properties
-            if (this.UserAccountService.Configuration.CustomUserPropertiesToClaimsMap != null)
+            var cmd = new MapClaimsFromAccount<TAccount> { Account = account };
+            this.UserAccountService.ExecuteCommand(cmd);
+            if (cmd.MappedClaims != null)
             {
-                claims.AddRange(this.UserAccountService.Configuration.CustomUserPropertiesToClaimsMap(account));
+                claims.AddRange(cmd.MappedClaims);
             }
 
             // create principal/identity
@@ -101,7 +109,7 @@ namespace BrockAllen.MembershipReboot
             }
 
             // issue cookie
-            IssueToken(cp);
+            IssueToken(cp, persistentCookie:persistent);
         }
 
         private static List<Claim> GetBasicClaims(TAccount account, string method)
@@ -141,11 +149,33 @@ namespace BrockAllen.MembershipReboot
         }
 
         public void SignInWithLinkedAccount(
+           string providerName,
+           string providerAccountID,
+           IEnumerable<Claim> externalClaims,
+           out TAccount account)
+        {
+            SignInWithLinkedAccount(null, providerName, providerAccountID, externalClaims, out account);
+        }
+
+        public void SignInWithLinkedAccount(
             string tenant,
             string providerName,
             string providerAccountID,
             IEnumerable<Claim> claims)
         {
+            TAccount account;
+            SignInWithLinkedAccount(null, providerName, providerAccountID, claims, out account);
+        }
+
+        public void SignInWithLinkedAccount(
+            string tenant,
+            string providerName,
+            string providerAccountID,
+            IEnumerable<Claim> claims,
+            out TAccount account)
+        {
+            account = null;
+
             if (!UserAccountService.Configuration.MultiTenant)
             {
                 tenant = UserAccountService.Configuration.DefaultTenant;
@@ -156,8 +186,7 @@ namespace BrockAllen.MembershipReboot
             if (String.IsNullOrWhiteSpace(providerAccountID)) throw new ArgumentException("providerAccountID");
             if (claims == null) throw new ArgumentNullException("claims");
 
-            TAccount account = null;
-            var user = ClaimsPrincipal.Current;
+            var user = GetCurentPrincipal();
             if (user.Identity.IsAuthenticated)
             {
                 // already logged in, so use the current user's account
@@ -174,7 +203,7 @@ namespace BrockAllen.MembershipReboot
                     var email = claims.GetValue(ClaimTypes.Email);
                     if (String.IsNullOrWhiteSpace(email))
                     {
-                        throw new ValidationException(Resources.ValidationMessages.AccountCreateFailNoEmailFromIdp);
+                        throw new ValidationException(UserAccountService.GetValidationMessage("AccountCreateFailNoEmailFromIdp"));
                     }
 
                     // guess at a name to use
@@ -184,19 +213,22 @@ namespace BrockAllen.MembershipReboot
                     {
                         name = email;
                     }
+                    else
+                    {
+                        name = name.Replace(" ", "");
+                    }
 
                     // check to see if email already exists
                     if (this.UserAccountService.EmailExists(tenant, email))
                     {
-                        throw new ValidationException(Resources.ValidationMessages.LoginFailEmailAlreadyAssociated);
+                        throw new ValidationException(UserAccountService.GetValidationMessage("LoginFailEmailAlreadyAssociated"));
                     }
 
                     // auto-gen a password, they can always reset it later if they want to use the password feature
                     // this is slightly dangerous if we don't do email account verification, so if email account
                     // verification is disabled then we need to be very confident that the external provider has
                     // provided us with a verified email
-                    var pwd = this.UserAccountService.Configuration.Crypto.GenerateSalt();
-                    account = this.UserAccountService.CreateAccount(tenant, name, pwd, email);
+                    account = this.UserAccountService.CreateAccount(tenant, name, null, email);
                 }
             }
 
@@ -204,12 +236,15 @@ namespace BrockAllen.MembershipReboot
 
             // add/update the provider with this account
             this.UserAccountService.AddOrUpdateLinkedAccount(account, providerName, providerAccountID, claims);
-            //this.UserAccountService.Update(account);
 
-            // signin from the account
-            // if we want to include the provider's claims, then perhaps this
-            // should be done in the claims transformer
-            this.SignIn(account, providerName);
+            // log them in if the account if they're verified
+            if (account.IsAccountVerified || !UserAccountService.Configuration.RequireAccountVerification)
+            {
+                // signin from the account
+                // if we want to include the provider's claims, then perhaps this
+                // should be done in the claims transformer
+                this.SignIn(account, providerName);
+            }
         }
 
         public virtual void SignOut()

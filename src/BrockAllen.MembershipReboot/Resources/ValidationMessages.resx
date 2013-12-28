@@ -135,6 +135,9 @@
   <data name="AddClientCertForTwoFactor" xml:space="preserve">
     <value>Add a client certificate to enable certificate two factor authentication.</value>
   </data>
+  <data name="CantRemoveLastLinkedAccountIfNoPassword" xml:space="preserve">
+    <value>You must set a password on the local account before you remove the last external login provider.</value>
+  </data>
   <data name="CertificateAlreadyInUse" xml:space="preserve">
     <value>That certificate is already in use by a different account.</value>
   </data>
@@ -204,6 +207,12 @@
   <data name="NewPasswordMustBeDifferent" xml:space="preserve">
     <value>The new password must be different than the old password.</value>
   </data>
+  <data name="ParentGroupAlreadyChild" xml:space="preserve">
+    <value>The parent group is already a child of the child group.</value>
+  </data>
+  <data name="ParentGroupSameAsChild" xml:space="preserve">
+    <value>The parent and child are the same groups.</value>
+  </data>
   <data name="PasswordComplexityRules" xml:space="preserve">
     <value>Password must contain at least {0} of the follwing characters: one upper, one lower, one digit and one other.</value>
   </data>
@@ -218,6 +227,9 @@
   </data>
   <data name="RegisterMobileForTwoFactor" xml:space="preserve">
     <value>Register a mobile phone number to enable mobile two factor authentication.</value>
+  </data>
+  <data name="ReopenErrorNoEmail" xml:space="preserve">
+    <value>Reopening the account is not possible since there is no email address for this account.</value>
   </data>
   <data name="SecretAnswerRequired" xml:space="preserve">
     <value>Secret answer required.</value>

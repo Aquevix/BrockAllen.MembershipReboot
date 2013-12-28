@@ -1,8 +1,12 @@
 ﻿using BrockAllen.MembershipReboot;
+using BrockAllen.MembershipReboot.Ef;
+using BrockAllen.MembershipReboot.Owin;
+using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Web;
@@ -15,29 +19,47 @@ namespace OwinHostSample
     {
         public void Configuration(IAppBuilder app)
         {
-            InitDb();
-
-            app.ConfigureMembershipReboot();
+            ConfigureMembershipReboot(app);
             app.UseNancy();
         }
 
-        private void InitDb()
+        private static void ConfigureMembershipReboot(IAppBuilder app)
         {
-            using (var db = new BrockAllen.MembershipReboot.Ef.DefaultUserAccountRepository())
+            System.Data.Entity.Database.SetInitializer(new System.Data.Entity.MigrateDatabaseToLatestVersion<DefaultMembershipRebootDatabase, BrockAllen.MembershipReboot.Ef.Migrations.Configuration>());
+            var cookieOptions = new CookieAuthenticationOptions
             {
-                var svc = new UserAccountService(db);
-                if (svc.GetByUsername("admin") == null)
-                {
-                    var account = svc.CreateAccount("admin", "admin123", "brockallen@gmail.com");
-                    svc.VerifyAccount(account.VerificationKey);
+                AuthenticationType = MembershipRebootOwinConstants.AuthenticationType
+            };
+            Func<IDictionary<string, object>, UserAccountService> uaFunc = env =>
+            {
+                var appInfo = new OwinApplicationInformation(
+                    env,
+                    "Test",
+                    "Test Email Signature",
+                    "/Login",
+                    "/Register/Confirm/",
+                    "/Register/Cancel/",
+                    "/PasswordReset/Confirm/");
 
-                    account = svc.GetByID(account.ID);
-                    account.AddClaim(ClaimTypes.Role, "Administrator");
-                    account.AddClaim(ClaimTypes.Role, "Manager");
-                    account.AddClaim(ClaimTypes.Country, "USA");
-                    svc.Update(account);
-                }
-            }
+                var config = new MembershipRebootConfiguration();
+                var emailFormatter = new EmailMessageFormatter(appInfo);
+                // uncomment if you want email notifications -- also update smtp settings in web.config
+                config.AddEventHandler(new EmailAccountEventsHandler(emailFormatter));
+
+                var svc = new UserAccountService(config, new DefaultUserAccountRepository());
+                var debugging = false;
+#if DEBUG
+                debugging = true;
+#endif
+                svc.ConfigureTwoFactorAuthenticationCookies(env, debugging);
+                return svc;
+            };
+            Func<IDictionary<string, object>, AuthenticationService> authFunc = env =>
+            {
+                return new OwinAuthenticationService(cookieOptions.AuthenticationType, uaFunc(env), env);
+            };
+
+            app.UseMembershipReboot(cookieOptions, uaFunc, authFunc);
         }
     }
 }

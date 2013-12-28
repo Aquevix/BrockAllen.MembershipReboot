@@ -10,9 +10,9 @@ namespace BrockAllen.MembershipReboot.Mvc.App_Start
     {
         public ValidationResult Validate(UserAccountService<CustomUserAccount> service, CustomUserAccount account, string value)
         {
-            if (value.Length < 4)
+            if (value.Contains("R"))
             {
-                return new ValidationResult("Password must be at least 4 characters long");
+                return new ValidationResult("You can't use an 'R' in your password (for some reason)");
             }
             
             return null;
@@ -28,6 +28,8 @@ namespace BrockAllen.MembershipReboot.Mvc.App_Start
             
             var config = new MembershipRebootConfiguration<CustomUserAccount>(settings);
             config.RegisterPasswordValidator(new PasswordValidator());
+            config.ConfigurePasswordComplexity(5, 3);
+
             config.CustomUserPropertiesToClaimsMap = user =>
                 {
                     return new System.Security.Claims.Claim[]
@@ -40,25 +42,18 @@ namespace BrockAllen.MembershipReboot.Mvc.App_Start
             var delivery = new SmtpMessageDelivery();
 
             var appinfo = new AspNetApplicationInformation("Test", "Test Email Signature",
-                "UserAccount/Login", 
-                "UserAccount/Register/Confirm/",
+                "UserAccount/Login",
+                "UserAccount/ChangeEmail/Confirm/",
                 "UserAccount/Register/Cancel/",
-                "UserAccount/PasswordReset/Confirm/",
-                "UserAccount/ChangeEmail/Confirm/");
+                "UserAccount/PasswordReset/Confirm/");
             var formatter = new CustomEmailMessageFormatter(appinfo);
 
-            if (settings.RequireAccountVerification)
-            {
-                config.AddEventHandler(new EmailAccountCreatedEventHandler<CustomUserAccount>(formatter, delivery));
-            }
             config.AddEventHandler(new EmailAccountEventsHandler<CustomUserAccount>(formatter, delivery));
             config.AddEventHandler(new AuthenticationAuditEventHandler());
             config.AddEventHandler(new NotifyAccountOwnerWhenTooManyFailedLoginAttempts());
 
             config.AddValidationHandler(new PasswordChanging());
             config.AddEventHandler(new PasswordChanged());
-
-            config.ConfigureCookieBasedTwoFactorAuthPolicy(new AspNetCookieBasedTwoFactorAuthPolicy<CustomUserAccount>());
 
             return config;
         }
